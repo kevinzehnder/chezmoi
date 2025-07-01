@@ -1,0 +1,38 @@
+
+% linux, kz
+# Show Linux Distribution Information
+bat /etc/*-release
+
+# Change Default Shell For Current User to ZSH
+sudo chsh -s $(which zsh) $(whoami)
+
+% xargs, kz
+# Add Input As Argument To The Command: <Command> <Input>
+echo <input> | xargs <command>
+
+# place argument to a specific location by using --replace / -I: <command> <input>
+echo <input> | xargs -I _ <command> _
+
+
+% tar, kz
+# Create An Archive File, Zipped, Verbose Output
+tar cfzv <filename>.tar.gz -C <goHereFirst> <directoryToInclude>/ 
+
+# Extract An Archive File, Unzip, Verbose Output
+tar xfzv <filename> -C <goHereFirst>
+
+
+% ripgrep, kz
+# Search Something In Current Directory Recursively
+rg <something>
+
+# Search Something In A Single File
+rg <something> <filename>
+
+# Search Something In A Directory Recursively
+rg <something> <directory>/
+
+# Search Something And Ignore Case
+rg -i <something>
+
+

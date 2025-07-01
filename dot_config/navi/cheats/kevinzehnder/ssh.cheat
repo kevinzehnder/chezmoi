@@ -1,0 +1,22 @@
+
+% kz, zsh, ssh
+# Fix SSH Folder/File Permissions
+fix_ssh_permissions
+
+# Get Files from SSH Server using FD/FZF
+sshget <server> <path>
+
+# Start SSH Agent
+eval "$(ssh-agent -s)"
+
+# SSH Using Only Explicitly Configured Keyfile
+ssh <user>@<server> -o IdentitiesOnly=yes -i <keyfile>
+
+# SSH Using Only Password (No Public Keys)
+ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password <user>@<server>
+
+# Create A Socks Proxy Through SSH
+ssh <server> -D <socksport>
+
+# SSH Using Key Forwarding
+ssh -A <server>

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# run_once_install-packages.sh.tmpl
+# This script runs once when chezmoi apply is first executed
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+echo -e "${YELLOW}Installing packages and setting up environment...${NC}"
+
+# Update system and install packages
+sudo pacman -Syu --needed --noconfirm git zsh starship go direnv
+
+echo -e "${GREEN}Setting ZSH as default shell...${NC}"
+if [ "$SHELL" != "$(which zsh)" ]; then
+    chsh -s $(which zsh)
+fi
+
+echo -e "${GREEN}Bootstrap complete! Restart your shell to use ZSH.${NC}"

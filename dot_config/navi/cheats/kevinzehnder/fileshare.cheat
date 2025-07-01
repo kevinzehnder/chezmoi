@@ -1,0 +1,54 @@
+
+% smbclient, smb, kz, pentest
+
+# Enumerate SMB shares anonymously
+smbclient -N -L <target>
+
+# Enumerate SMB shares as <user>
+smbclient -U <username> -L <target>
+
+# Mount SMB share, using Credentials from File (ensure cifs-utils is installed)
+; ensure cifs-utils is installed
+; the options uid and gid corresponds to the local (e.g. client) user/user group to have read/write access on the given path. 
+; After installing cifs-utils or smbclient, load the cifs kernel module or reboot to prevent mount fails.
+$ mountpath: ls
+sudo mount -t cifs //<server>/<share> <mountpath> -o vers=3.0,credentials=<credentialsfile> -o uid=<uid>,gid=<gid>
+
+% kz, nfs
+$subnet: ip route | rg -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+' | choose 0
+# Scan for NFS Servers in Current Subnet
+nmap -p 2049 <subnet> --open -oG - | rg "/open"
+
+# Show NFS Shares on Remote Server (requires nfs-common or nfs-utils)
+showmount -e <server>
+
+# Test if Host is an NFS Server
+nmap -sV -T4 -p111,2049 <server>
+
+# Verify NFS Server is Running
+rpcinfo -n 2049 -t <server> <port>
+$port: echo 100003
+
+% kz, nfs, mount
+$share: showmount -e <server> --no-headers | choose 0
+$mountpoint: ls
+
+# Mount NFSv4 Share
+mount -t nfs4 <server>:/<share> <mountpoint>
+
+# Mount NFSv3 Share
+mount -t nfs <server>:/<share> <mountpoint>
+
+# Force Specific NFS Version
+mount -t nfs -o vers=3 <server>:/<share> <mountpoint>
+
+# Mount with Options (no root squash)
+mount -t nfs4 <server>:/<share> <mountpoint> -o nolock,rw,no_root_squash
+
+
+% kz, nfs, server
+# Reload NFS Exports on Server
+exportfs -ra
+
+# Check Active Exports
+exportfs -v
