@@ -16,7 +16,7 @@ echo -e "${YELLOW}Installing packages and setting up environment...${NC}"
 pacman -Syu --needed --noconfirm sudo which unzip base-devel
 
 # Update system and install packages
-sudo pacman -Syu --needed --noconfirm git zsh starship go direnv
+sudo pacman -Syu --needed --noconfirm git zsh starship go direnv fzf fd ripgrep eza procs navi
 
 echo -e "${GREEN}Setting ZSH as default shell...${NC}"
 if [ "$SHELL" != "$(which zsh)" ]; then
