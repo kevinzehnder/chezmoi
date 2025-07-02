@@ -13,7 +13,7 @@ NC='\033[0m'
 echo -e "${YELLOW}Installing packages and setting up environment...${NC}"
 
 # Install basic utilities first (minimal Arch doesn't have these)
-pacman -Syu --needed --noconfirm sudo which unzip base-devel
+sudo pacman -Syu --needed --noconfirm which unzip base-devel
 
 # Update system and install packages
 sudo pacman -Syu --needed --noconfirm git zsh starship go direnv fzf fd ripgrep eza procs navi
