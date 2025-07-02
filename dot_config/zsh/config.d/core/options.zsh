@@ -20,11 +20,11 @@ setopt hist_verify            # Do not execute immediately upon history expansio
 setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
 
 # Directory navigation
-setopt auto_cd              # Use cd by typing directory name if it's not a command.
-setopt auto_list            # Automatically list choices on ambiguous completion.
-setopt auto_pushd           # Make cd push the old directory onto the directory stack.
-setopt pushd_ignore_dups    # Don't push multiple copies directory onto the directory stack.
-setopt pushd_minus          # Swap the meaning of cd +1 and cd -1 to the opposite.
+setopt auto_cd           # Use cd by typing directory name if it's not a command.
+setopt auto_list         # Automatically list choices on ambiguous completion.
+setopt auto_pushd        # Make cd push the old directory onto the directory stack.
+setopt pushd_ignore_dups # Don't push multiple copies directory onto the directory stack.
+setopt pushd_minus       # Swap the meaning of cd +1 and cd -1 to the opposite.
 
 # Other settings
 setopt bang_hist            # Treat the '!' character, especially during Expansion.
@@ -32,5 +32,3 @@ setopt interactive_comments # Comments even in interactive shells.
 setopt multios              # Implicit tees or cats when multiple redirections are attempted.
 setopt no_beep              # Don't beep on error.
 setopt prompt_subst         # Substitution of parameters inside the prompt each time the prompt is drawn.
-
-eval $(dircolors ${HOME}/.dircolors)
