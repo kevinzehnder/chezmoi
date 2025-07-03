@@ -1,0 +1,12 @@
+# ~/.config/chezmoi/chezmoi.toml
+# This is the configuration file for chezmoi itself.
+
+[data]
+    name = "Kevin Zehnder"
+    github_user = "kevinzehnder"
+
+[edit]
+    command = "nvim"
+
+[secret]
+    command = "bw"
