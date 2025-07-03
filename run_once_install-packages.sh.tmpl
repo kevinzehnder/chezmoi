@@ -16,40 +16,42 @@ NC='\033[0m'
 # Installs packages using pacman.
 # Ensures 'sudo' is installed if run as root.
 install_packages() {
-    echo -e "${YELLOW}Updating system and installing packages...${NC}"
+	echo -e "${YELLOW}Updating system and installing packages...${NC}"
 
-    # Package list organized into a Bash array for better readability and management.
-    local packages=(
-        # --- Core System Utilities ---
-        "base-devel"    # For building packages (e.g., from AUR)
-        "git"           # Version control
-        "go"            # Go programming language
-        "sudo"          # Privilege escalation
-        "unzip"         # For extracting zip files
-        "which"         # To find command locations
-        "zsh"           # The Z shell
+	# Package list organized into a Bash array for better readability and management.
+	local packages=(
+		# --- Core System Utilities ---
+		"base-devel" # For building packages (e.g., from AUR)
+		"git"        # Version control
+		"go"         # Go programming language
+		"sudo"       # Privilege escalation
+		"unzip"      # For extracting zip files
+		"which"      # To find command locations
+		"zsh"        # The Z shell
 
-        # --- Modern CLI Tools & Enhancements ---
-        "direnv"        # Environment variable manager
-        "eza"           # A modern replacement for 'ls'
-        "fd"            # A simple, fast and user-friendly alternative to 'find'
-        "fzf"           # A command-line fuzzy finder
-        "navi"          # An interactive cheatsheet tool
-        "procs"         # A modern replacement for 'ps'
-        "ripgrep"       # A fast alternative to 'grep'
+		# --- Modern CLI Tools & Enhancements ---
+		"direnv"  # Environment variable manager
+		"eza"     # A modern replacement for 'ls'
+		"fd"      # A simple, fast and user-friendly alternative to 'find'
+		"fzf"     # A command-line fuzzy finder
+		"navi"    # An interactive cheatsheet tool
+		"procs"   # A modern replacement for 'ps'
+		"ripgrep" # A fast alternative to 'grep'
+		"dust"
+		"duf"
 
-        # --- Shell Prompt ---
-        "starship"      # The cross-shell prompt
-    )
-    
-    echo -e "${YELLOW}Installing packages: ${packages[*]}${NC}"
+		# --- Shell Prompt ---
+		"starship" # The cross-shell prompt
+	)
 
-    if [ "$EUID" -eq 0 ]; then
-        pacman -Syu --needed --noconfirm "${packages[@]}"
-    else
-        sudo pacman -Syu --needed --noconfirm "${packages[@]}"
-    fi
-    echo -e "${GREEN}Packages installed successfully.${NC}"
+	echo -e "${YELLOW}Installing packages: ${packages[*]}${NC}"
+
+	if [ "$EUID" -eq 0 ]; then
+		pacman -Syu --needed --noconfirm "${packages[@]}"
+	else
+		sudo pacman -Syu --needed --noconfirm "${packages[@]}"
+	fi
+	echo -e "${GREEN}Packages installed successfully.${NC}"
 }
 
 # Installs the 'yay' AUR helper.
