@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # run_once_install-packages.sh.tmpl
-# This script runs once when chezmoi apply is first executed
+# This script runs once when chezmoi apply is first executed.
+# It handles being run as root or as a regular user with sudo privileges.
 
 set -e
 
@@ -10,23 +11,105 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
-echo -e "${YELLOW}Installing packages and setting up environment...${NC}"
+# --- Helper Functions ---
 
-# Update system and install packages
-sudo pacman -Syu --needed --noconfirm which unzip base-devel git zsh starship go direnv fzf fd ripgrep eza procs navi vivid neovim
+# Installs packages using pacman.
+# Ensures 'sudo' is installed if run as root.
+install_packages() {
+	echo -e "${YELLOW}Updating system and installing packages...${NC}"
+	local packages="which unzip base-devel git zsh starship go direnv fzf fd ripgrep eza procs navi vivid"
 
-# Install AUR helper (yay)
-if ! command -v yay &> /dev/null; then
-    echo -e "${YELLOW}Installing AUR helper (yay)...${NC}"
-    git clone https://aur.archlinux.org/yay.git /tmp/yay
-    (cd /tmp/yay && makepkg -si --noconfirm)
-    rm -rf /tmp/yay
-    echo -e "${GREEN}yay installed successfully.${NC}"
-fi
+	if [ "$EUID" -eq 0 ]; then
+		pacman -Syu --needed --noconfirm sudo $packages
+	else
+		sudo pacman -Syu --needed --noconfirm $packages
+	fi
+	echo -e "${GREEN}Packages installed successfully.${NC}"
+}
 
-echo -e "${GREEN}Setting ZSH as default shell...${NC}"
-if [ "$SHELL" != "$(which zsh)" ]; then
-    chsh -s $(which zsh)
+# Installs the 'yay' AUR helper.
+# Handles being run as root by switching to the specified user for makepkg.
+# $1: The non-root username to run makepkg as.
+install_aur_helper() {
+	if command -v yay &> /dev/null; then
+		echo -e "${GREEN}AUR helper (yay) is already installed.${NC}"
+		return
+	fi
+
+	echo -e "${YELLOW}Installing AUR helper (yay)...${NC}"
+	local real_user="$1"
+
+	# Clean up previous attempts
+	rm -rf /tmp/yay
+
+	git clone https://aur.archlinux.org/yay.git /tmp/yay
+
+	if [ "$EUID" -eq 0 ]; then
+		if [ -z "$real_user" ] || [ "$real_user" == "root" ]; then
+			echo -e "${YELLOW}Cannot build AUR packages as root. Skipping 'yay' installation.${NC}"
+			echo -e "${YELLOW}Please create a non-root user to build and install AUR packages.${NC}"
+			rm -rf /tmp/yay
+			return
+		fi
+		echo -e "${YELLOW}Running makepkg as user '$real_user'...${NC}"
+		chown -R "$real_user:$real_user" /tmp/yay
+		sudo -u "$real_user" bash -c "cd /tmp/yay && makepkg -si --noconfirm"
+	else
+		# Running as a regular user
+		(cd /tmp/yay && makepkg -si --noconfirm)
+	fi
+
+	rm -rf /tmp/yay
+	echo -e "${GREEN}yay installed successfully.${NC}"
+}
+
+# Sets ZSH as the default shell for a user.
+# $1: The username to change the shell for.
+set_default_shell() {
+	local user_to_set_shell_for="$1"
+	local shell_path
+	shell_path=$(which zsh)
+
+	echo -e "${YELLOW}Setting ZSH as default shell for user '$user_to_set_shell_for'...${NC}"
+
+	# Get the current default shell for the target user from /etc/passwd
+	local current_shell
+	current_shell=$(getent passwd "$user_to_set_shell_for" | cut -d: -f7)
+
+	if [ "$current_shell" != "$shell_path" ]; then
+		if [ "$EUID" -eq 0 ]; then
+			chsh -s "$shell_path" "$user_to_set_shell_for"
+		else
+			# chsh requires root privileges to change another user's shell,
+			# or no privileges to change one's own shell (but may ask for password).
+			sudo chsh -s "$shell_path" "$user_to_set_shell_for"
+		fi
+		echo -e "${GREEN}Default shell for '$user_to_set_shell_for' has been set to ZSH.${NC}"
+	else
+		echo -e "${GREEN}ZSH is already the default shell for '$user_to_set_shell_for'.${NC}"
+	fi
+}
+
+# --- Main Execution ---
+
+echo -e "${YELLOW}Starting environment bootstrap...${NC}"
+
+if [ "$EUID" -eq 0 ]; then
+	# When run as root, we need the actual username for user-specific tasks.
+	# chezmoi provides this via the .chezmoi.username template variable.
+	real_user="{{ .chezmoi.username }}"
+	echo "Script is running as root. Assuming user is '$real_user'."
+
+	install_packages
+	install_aur_helper "$real_user"
+	set_default_shell "$real_user"
+else
+	# When run as a normal user, use sudo for privileged operations.
+	echo "Script is running as user '$USER'. Using sudo for privileged operations."
+
+	install_packages
+	install_aur_helper "$USER"
+	set_default_shell "$USER"
 fi
 
 echo -e "${GREEN}Bootstrap complete! Restart your shell to use ZSH.${NC}"
