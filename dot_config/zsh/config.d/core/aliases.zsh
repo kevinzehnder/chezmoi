@@ -62,8 +62,9 @@ alias gh='gh.exe' # use windows based gh, because it supports credential store
 alias tldrf="tldr --list | fzf --ansi --preview 'script -qec \"tldr {1}\" /dev/null' --height=80% --preview-window=right,60% | xargs tldr"
 
 # Dotfiles management
-alias lazyconfig='lazygit --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+# alias lazyconfig='lazygit --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+# alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+alias lazyconfig='lazygit --path=$HOME/.local/share/chezmoi'
 
 # Kubernetes
 alias k='kubectl'
