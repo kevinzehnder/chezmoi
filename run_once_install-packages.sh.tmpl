@@ -12,11 +12,17 @@ NC='\033[0m'
 
 echo -e "${YELLOW}Installing packages and setting up environment...${NC}"
 
-# Install basic utilities first (minimal Arch doesn't have these)
-sudo pacman -Syu --needed --noconfirm which unzip base-devel
-
 # Update system and install packages
-sudo pacman -Syu --needed --noconfirm git zsh starship go direnv fzf fd ripgrep eza procs navi
+sudo pacman -Syu --needed --noconfirm which unzip base-devel git zsh starship go direnv fzf fd ripgrep eza procs navi vivid neovim
+
+# Install AUR helper (yay)
+if ! command -v yay &> /dev/null; then
+    echo -e "${YELLOW}Installing AUR helper (yay)...${NC}"
+    git clone https://aur.archlinux.org/yay.git /tmp/yay
+    (cd /tmp/yay && makepkg -si --noconfirm)
+    rm -rf /tmp/yay
+    echo -e "${GREEN}yay installed successfully.${NC}"
+fi
 
 echo -e "${GREEN}Setting ZSH as default shell...${NC}"
 if [ "$SHELL" != "$(which zsh)" ]; then
