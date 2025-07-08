@@ -37,3 +37,6 @@ setup_ssh_agent() {
 if command -v wsl2-ssh-agent &> /dev/null; then
     eval "$(wsl2-ssh-agent)"
 fi
+
+# use bitwarden agent if we're on Arch
+[[ -f /etc/arch-release ]] && export SSH_AUTH_SOCK=$HOME/.bitwarden-ssh-agent.sock
