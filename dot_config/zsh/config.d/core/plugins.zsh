@@ -9,7 +9,7 @@ zinit for \
 
 zinit wait lucid for \
 	Aloxaf/fzf-tab \
-	zdharma-continuum/fast-syntax-highlighting \
+	zsh-users/zsh-syntax-highlighting \
 	zsh-users/zsh-completions
 
 # Architecture-specific tools
