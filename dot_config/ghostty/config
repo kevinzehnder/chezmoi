@@ -1,4 +1,5 @@
-font-family = IosevkaTerm
+font-family = IosevkaTerm Nerd Font
+theme = dark:tokyonight-storm,light:Builtin Solarized Light
 
 window-decoration = server
 gtk-titlebar-hide-when-maximized = true
