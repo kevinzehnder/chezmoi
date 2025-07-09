@@ -6,7 +6,7 @@ alias gruv='colorschemeswitcher gruvbox'
 function colorschemeswitcher() {
 	if [ "$1" = "solarized" ]; then
 		touch ~/.lightmode
-		base16_solarized-light
+		# base16_solarized-light
 		[ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
 		export BAT_THEME="gruvbox-light"
 		export LS_COLORS="$(vivid generate solarized-light)"
@@ -15,7 +15,7 @@ function colorschemeswitcher() {
 	elif [ "$1" = "gruvbox" ]; then
 		rm -f ~/.lightmode
 		export LS_COLORS="$(vivid generate gruvbox-dark)"
-		base16_gruvbox-dark-medium
+		# base16_gruvbox-dark-medium
 		[ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
 		export BAT_THEME="gruvbox-dark"
 		change_zellij_theme "gruvbox"
@@ -66,14 +66,11 @@ function change_k9s_theme() {
 }
 
 function darkmodechecker() {
-	# Check if the AppsUseLightTheme registry key exists and its value is 1
-	# if /mnt/c/Windows/System32/reg.exe query 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize' /v AppsUseLightTheme | grep -q '0x1'; then
-	if [ -f ~/.lightmode ]; then
-		# If the registry key value is 1, execute "light"
-		light
-	else
-		# If the registry key value is not 1, execute "dark"
+	theme=$(gsettings get org.gnome.desktop.interface gtk-theme)
+	if [[ "$theme" == *Dark* ]]; then
 		dark
+	else
+		light
 	fi
 }
 

@@ -3,8 +3,8 @@
 #
 
 # Base plugins that need to be loaded first
+	# chriskempson/base16-shell \
 zinit for \
-	chriskempson/base16-shell \
 	nocompile tinted-theming/tinted-fzf
 
 zinit wait lucid for \
