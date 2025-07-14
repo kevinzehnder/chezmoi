@@ -1,4 +1,4 @@
-font-family = IosevkaTerm Nerd Font
+font-family = IosevkaTerm NFP
 theme = dark:tokyonight-storm,light:Builtin Solarized Light
 
 window-decoration = server
