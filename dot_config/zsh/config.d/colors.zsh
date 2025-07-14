@@ -6,23 +6,30 @@ alias gruv='colorschemeswitcher gruvbox'
 function colorschemeswitcher() {
 	if [ "$1" = "solarized" ]; then
 		touch ~/.lightmode
-		# base16_solarized-light
+
+		export BASE16_THEME="solarized-light"
 		[ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
+		
 		export BAT_THEME="gruvbox-light"
 		export LS_COLORS="$(vivid generate solarized-light)"
 		change_zellij_theme "solarized-light"
 		change_k9s_theme "solarized_light"
 	elif [ "$1" = "gruvbox" ]; then
 		rm -f ~/.lightmode
-		export LS_COLORS="$(vivid generate gruvbox-dark)"
-		# base16_gruvbox-dark-medium
+		
+		export BASE16_THEME="gruvbox-dark"
 		[ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
+
 		export BAT_THEME="gruvbox-dark"
+		export LS_COLORS="$(vivid generate gruvbox-dark)"
 		change_zellij_theme "gruvbox"
 	else
 		rm -f ~/.lightmode
-		[ -f ~/.config/base16/base16-tokyo-night.config ] && source ~/.config/base16/base16-tokyo-night.config
-		[ -f $HOME/.config/base16/base16-tokyo-night.sh ] && source $HOME/.config/base16/base16-tokyo-night.sh
+		
+		# fzf
+		export BASE16_THEME="tokyo-night-storm"
+		[ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
+
 		export BAT_THEME="base16-256"
 		export LS_COLORS="$(vivid generate tokyonight-storm)"
 		change_zellij_theme "tokyo-night-dark"
