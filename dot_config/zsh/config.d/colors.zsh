@@ -8,7 +8,7 @@ function colorschemeswitcher() {
 		touch ~/.lightmode
 
 		export BASE16_THEME="solarized-light"
-		[ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
+		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
 		
 		export BAT_THEME="gruvbox-light"
 		export LS_COLORS="$(vivid generate solarized-light)"
@@ -18,7 +18,7 @@ function colorschemeswitcher() {
 		rm -f ~/.lightmode
 		
 		export BASE16_THEME="gruvbox-dark"
-		[ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
+		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
 
 		export BAT_THEME="gruvbox-dark"
 		export LS_COLORS="$(vivid generate gruvbox-dark)"
@@ -28,7 +28,7 @@ function colorschemeswitcher() {
 		
 		# fzf
 		export BASE16_THEME="tokyo-night-storm"
-		[ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
+		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
 
 		export BAT_THEME="base16-256"
 		export LS_COLORS="$(vivid generate tokyonight-storm)"
