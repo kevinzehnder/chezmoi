@@ -29,10 +29,10 @@ export FZF_DEFAULT_OPTS="
 --pointer='▶' 
 --marker='✓' 
 --bind 'ctrl-a:select-all'
---color=bg:0,fg:7,hl:3
---color=bg+:8,fg+:7,hl+:11
---color=info:3,border:3,prompt:4
---color=pointer:0,marker:9,spinner:9,header:1
+--color=bg:-1,fg:-1,hl:-1
+--color=bg+:-1,fg+:-1,hl+:-1
+--color=info:-1,border:-1,prompt:-1
+--color=pointer:-1,marker:-1,spinner:-1,header:-1
 "
 
 export FZF_ALT_C_COMMAND='fd --type directory'
