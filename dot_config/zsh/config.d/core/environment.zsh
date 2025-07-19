@@ -23,16 +23,16 @@ export FZF_DEFAULT_OPTS="
 --bind='ctrl-space:toggle' 
 --info=inline 
 --height=50% 
---ansi
+--ansi 
 --multi 
 --prompt='∼ ' 
 --pointer='▶' 
 --marker='✓' 
---bind 'ctrl-a:select-all'
---color=bg:-1,fg:-1,hl:-1
---color=bg+:-1,fg+:-1,hl+:-1
---color=info:-1,border:-1,prompt:-1
---color=pointer:-1,marker:-1,spinner:-1,header:-1
+--bind 'ctrl-a:select-all' 
+--color=bg:-1,fg:-1,hl:-1 
+--color=bg+:-1,fg+:-1,hl+:-1 
+--color=info:-1,border:-1,prompt:-1 
+--color=pointer:-1,marker:-1,spinner:-1,header:-1 
 "
 
 export FZF_ALT_C_COMMAND='fd --type directory'
@@ -51,11 +51,11 @@ export FZF_CTRL_T_OPTS="
 "
 
 export FZF_COMMON_OPTIONS="
---bind='?:toggle-preview'
---bind='ctrl-space:toggle'
---bind='ctrl-u:preview-page-up'
---bind='ctrl-d:preview-page-down'
---preview-window 'right:60%:hidden:wrap'
+--bind='?:toggle-preview' 
+--bind='ctrl-space:toggle' 
+--bind='ctrl-u:preview-page-up' 
+--bind='ctrl-d:preview-page-down' 
+--preview-window 'right:60%:hidden:wrap' 
 --preview '([[ -d {} ]] && tree -C {}) || ([[ -f {} ]] && bat --style=full --color=always {}) || echo {}'"
 
 # Navi settings
