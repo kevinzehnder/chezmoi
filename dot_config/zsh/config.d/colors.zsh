@@ -30,7 +30,7 @@ function colorschemeswitcher() {
 		export BASE16_THEME="tokyo-night-storm"
 		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
 
-		export BAT_THEME="base16-256"
+		export BAT_THEME="ansi"
 		export LS_COLORS="$(vivid generate tokyonight-storm)"
 		change_zellij_theme "tokyo-night-dark"
 		change_k9s_theme "nord"
