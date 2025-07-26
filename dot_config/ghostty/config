@@ -4,3 +4,6 @@ theme = dark:tokyonight-storm,light:Builtin Solarized Light
 window-decoration = server
 gtk-titlebar-hide-when-maximized = true
 
+keybind = alt+h=previous_tab
+keybind = alt+l=next_tab
+keybind = alt+s=write_screen_file:open
