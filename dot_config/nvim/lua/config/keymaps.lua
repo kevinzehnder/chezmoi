@@ -71,10 +71,10 @@ vim.keymap.set("n", "<C-left>", ":vertical resize +2<CR>", { desc = "Resize Wind
 -- harpoon
 vim.keymap.set("n", "<leader>hh", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", { desc = "Menu" })
 vim.keymap.set("n", "<leader>ha", "<cmd>lua require('harpoon.mark').add_file()<cr>", { desc = "Add File" })
-vim.keymap.set("n", "<A-f>", "<cmd>lua require('harpoon.ui').nav_file(1)<cr>", { desc = "File 1" })
-vim.keymap.set("n", "<A-d>", "<cmd>lua require('harpoon.ui').nav_file(2)<cr>", { desc = "File 2" })
-vim.keymap.set("n", "<A-s>", "<cmd>lua require('harpoon.ui').nav_file(3)<cr>", { desc = "File 3" })
-vim.keymap.set("n", "<A-a>", "<cmd>lua require('harpoon.ui').nav_file(4)<cr>", { desc = "File 4" })
+vim.keymap.set("n", "<leader>hf", "<cmd>lua require('harpoon.ui').nav_file(1)<cr>", { desc = "File 1" })
+vim.keymap.set("n", "<leader>hd", "<cmd>lua require('harpoon.ui').nav_file(2)<cr>", { desc = "File 2" })
+vim.keymap.set("n", "<leader>hr", "<cmd>lua require('harpoon.ui').nav_file(3)<cr>", { desc = "File 3" })
+vim.keymap.set("n", "<leader>he", "<cmd>lua require('harpoon.ui').nav_file(4)<cr>", { desc = "File 4" })
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
