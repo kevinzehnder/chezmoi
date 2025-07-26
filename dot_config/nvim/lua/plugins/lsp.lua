@@ -260,5 +260,24 @@ return {
 				}
 			}
 		})
+
+		require("lspconfig").pyright.setup({
+			init_options = {
+				settings = {
+					pyright = {
+						disableOrganizeImports = true, -- Using Ruff
+					},
+					python = {
+						analysis = {
+							diagnosticSeverityOverrides = {
+								reportUndefinedVariable = "none",
+								reportUnusedVariable = "none",
+							},
+							typeCheckingMode = "standard",
+						},
+					},
+				}
+			}
+		})
 	end,
 }
