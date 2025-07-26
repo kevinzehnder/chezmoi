@@ -44,15 +44,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	end
 })
 
--- auto toggle nvim-tree
--- vim.api.nvim_create_autocmd({ "BufNewFile", "BufReadPost" }, {
--- 	callback = function (args)
--- 		if vim.fn.expand("%:p") ~= "" then
--- 			vim.api.nvim_del_autocmd(args.id)
--- 			vim.cmd("noautocmd NvimTreeOpen")
--- 			vim.schedule(function ()
--- 				vim.cmd("wincmd p")
--- 			end)
--- 		end
--- 	end,
--- })
+vim.api.nvim_create_autocmd("VimEnter", {
+	callback = function ()
+		if vim.fn.argc() == 0 then
+			require("neo-tree.command").execute({ action = "show" })
+		end
+	end,
+})
