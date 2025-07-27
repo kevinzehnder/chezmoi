@@ -7,3 +7,6 @@ gtk-titlebar-hide-when-maximized = true
 keybind = alt+h=previous_tab
 keybind = alt+l=next_tab
 keybind = alt+s=write_screen_file:open
+
+keybind = alt+i=increase_font_size:2
+keybind = alt+d=decrease_font_size:2
