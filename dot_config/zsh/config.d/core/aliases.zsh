@@ -58,7 +58,6 @@ alias lg='lazygit'
 alias t='task'
 alias tf='terraform'
 alias tm='tmux attach -t default || tmux new -s default'
-alias gh='gh.exe' # use windows based gh, because it supports credential store
 alias tldrf="tldr --list | fzf --ansi --preview 'script -qec \"tldr {1}\" /dev/null' --height=80% --preview-window=right,60% | xargs tldr"
 
 # Dotfiles management
