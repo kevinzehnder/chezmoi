@@ -4,11 +4,10 @@
 
 style:
   snippet:
-    color: grey
     width_percentage: 25
 
   comment:
-    color: blue
+    color: yellow
     width_percentage: 55
     min_width: 30
 
