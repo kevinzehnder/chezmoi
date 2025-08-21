@@ -25,6 +25,7 @@ return {
 			yaml = { "yamlfmt", stop_after_first = true },
 			zsh = { "shfmt" },
 			sshconfig = { "ssh_config_fmt" },
+			markdown = { "prettier" },
 		},
 		-- Set default options
 		default_format_opts = {

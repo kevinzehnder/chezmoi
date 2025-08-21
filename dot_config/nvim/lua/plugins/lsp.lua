@@ -255,7 +255,7 @@ return {
 		require("mason-lspconfig").setup({
 			ensure_installed = {
 				"lua_ls",
-				"yamllint",
+				"yamlls",
 			},
 			automatic_installation = {},
 			handlers = {
