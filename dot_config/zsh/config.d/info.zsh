@@ -1,7 +1,7 @@
 function info() {
 	local os=$(rg -N "PRETTY" /etc/os-release | awk -F '=' '{print $2}' | tr -d '"')
 	local kernel=$(uname -r)
-	local uptime=$(uptime -p)
+	local uptime=$(uptime)
 	local load=$(head -1 /proc/loadavg | awk '{print $1, $2, $3}')
 	local active_services=$(systemctl list-units --type=service --state=active | rg -N "loaded active" | wc -l)
 	local listening=$(ss -tulpn | rg -N LISTEN | wc -l)
