@@ -17,6 +17,7 @@ vim.keymap.set("n", "<leader>lR", "<cmd>Telescope lsp_references<CR>", { desc = 
 -- panels keymaps
 vim.keymap.set("n", "<A-H>", "<cmd>Neotree toggle<CR>", { desc = "Toggle NeoTree" })
 vim.keymap.set("n", "<A-M>", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Toggle Diagnostics" })
+vim.keymap.set("n", "<A-T>", "<cmd>Trouble todo toggle<cr>", { desc = "Toggle ToDos" })
 --
 -- Toggle quickfix with Alt-N
 vim.keymap.set("n", "<A-N>", function ()
