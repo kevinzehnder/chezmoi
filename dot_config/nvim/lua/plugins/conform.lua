@@ -26,6 +26,7 @@ return {
 			zsh = { "shfmt" },
 			sshconfig = { "ssh_config_fmt" },
 			markdown = { "prettier" },
+			-- python = { "ruff_organize_imports" },
 		},
 		-- Set default options
 		default_format_opts = {
