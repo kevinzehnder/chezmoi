@@ -11,6 +11,12 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
+# Check if running on Arch Linux
+if ! command -v pacman &> /dev/null; then
+    echo -e "${RED}This script is designed for Arch Linux only. Exiting.${NC}"
+    exit 0
+fi
+
 # --- Helper Functions ---
 
 # Installs packages using pacman.
