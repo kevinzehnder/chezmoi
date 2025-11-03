@@ -1,7 +1,7 @@
 # procs that also shows open ports
 function procsp() {
 	check_sudo_nopass || sudo -v
-	sudo procs --color always --load-config ~/.config/procs/procs_ports.toml "$@" | fzf --ansi
+	sudo procs --load-config ~/.config/procs/procs_ports.toml "$@" | fzf --ansi
 }
 
 # procs large view
@@ -58,7 +58,7 @@ function portz() {
 # interactive kill thru procs and FZF
 function psk() {
 	check_sudo_nopass || sudo -v
-	sudo procs --color always | fzf --ansi \
+	sudo procs --use-config=large | fzf --ansi \
 		--preview "sudo procs --no-header --pager=disable --tree {1}" \
 		--preview-window=down \
 		--bind='ctrl-r:reload(sudo procs)' \
@@ -71,7 +71,7 @@ function psk() {
 # find cpu hogs
 function cpuhogs() {
 	check_sudo_nopass || sudo -v
-	sudo procs --color always --sortd cpu --no-header | head -n 10 | fzf --ansi \
+	sudo procs --sortd cpu --no-header | head -n 10 | fzf --ansi \
 		--preview "sudo procs --tree {1}" \
 		--preview-window=down \
 		--height=100% \
@@ -84,7 +84,7 @@ function cpuhogs() {
 # find memory hogs
 function memhogs() {
 	check_sudo_nopass || sudo -v
-	sudo procs --color always --sortd mem --no-header | head -n 15 | fzf --ansi \
+	sudo procs --sortd mem --no-header | head -n 15 | fzf --ansi \
 		--preview "sudo procs --tree {1} && echo '\n---Memory Maps---\n' && sudo pmap -x {1} | head -n 20" \
 		--preview-window=down,wrap \
 		--height=100% \
