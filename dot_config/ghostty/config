@@ -1,10 +1,13 @@
-font-family = IosevkaTerm NFP
-font-size = 13
-theme = dark:tokyonight-storm,light:Builtin Solarized Light
+font-family = IosevkaTerm NF
+font-family-bold = IosevkaTerm NF Heavy
+font-size=12
+
+theme = dark:TokyoNight Storm,light:Builtin Solarized Light
 
 window-decoration = server
 gtk-titlebar-hide-when-maximized = true
 
+keybind = f5=reload_config
 keybind = alt+ctrl+k=previous_tab
 keybind = alt+ctrl+j=next_tab
 keybind = alt+ctrl+s=write_screen_file:open
