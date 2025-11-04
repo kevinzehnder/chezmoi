@@ -14,11 +14,11 @@ NC='\033[0m'
 {{- $arch := .chezmoi.arch }}
 {{- $goArch := $arch }}
 {{- if eq $arch "amd64" }}
-{{-   $goArch = "amd64"
+{{-   $goArch = "amd64" }}
 {{- else if eq $arch "arm64" }}
-{{-   $goArch = "arm64"
+{{-   $goArch = "arm64" }}
 {{- else if eq $arch "arm" }}
-{{-   $goArch = "armv6l"
+{{-   $goArch = "armv6l" }}
 {{- end }}
 
 GO_VERSION="{{ $goVersion }}"
