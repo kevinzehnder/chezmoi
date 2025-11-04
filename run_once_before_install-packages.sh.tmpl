@@ -5,7 +5,8 @@
 # Supports: Arch, Ubuntu, Debian, RHEL, AlmaLinux, Rocky, Fedora
 # This script runs once when chezmoi apply is first executed.
 
-set -e
+set -e  # Exit on error
+set -o pipefail  # Catch errors in pipes
 
 # --- Colors ---
 GREEN='\033[0;32m'
@@ -51,6 +52,13 @@ exit 0
 set_default_shell() {
     local user_to_set_shell_for="$1"
     local shell_path
+
+    # Check if zsh is installed
+    if ! command -v zsh &> /dev/null; then
+        echo -e "${YELLOW}ZSH not found, skipping shell change${NC}"
+        return 0
+    fi
+
     shell_path=$(command -v zsh)
 
     echo -e "${YELLOW}Setting ZSH as default shell for user '$user_to_set_shell_for'...${NC}"
@@ -86,13 +94,24 @@ install_starship_via_script() {
         return 0
     fi
 
+    # Check if curl is available
+    if ! command -v curl &> /dev/null; then
+        echo -e "${YELLOW}curl not found, skipping Starship installation${NC}"
+        return 0
+    fi
+
     echo -e "${YELLOW}Installing Starship prompt...${NC}"
     if [ "$EUID" -eq 0 ]; then
-        curl -sS https://starship.rs/install.sh | sh -s -- -y
+        curl -fsSL https://starship.rs/install.sh | sh -s -- -y
     else
-        curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
+        curl -fsSL https://starship.rs/install.sh | sudo sh -s -- -y
     fi
-    echo -e "${GREEN}✓ Starship installed${NC}"
+
+    if command -v starship &> /dev/null; then
+        echo -e "${GREEN}✓ Starship installed${NC}"
+    else
+        echo -e "${YELLOW}Starship installation may have failed${NC}"
+    fi
 }
 
 {{- if eq $osID "arch" }}
