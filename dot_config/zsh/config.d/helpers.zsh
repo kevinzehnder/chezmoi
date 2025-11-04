@@ -69,16 +69,61 @@ function parse_ssh_config() {
 }
 
 # Helper function to detect package manager
+# Returns the primary package manager for the current system
 function get_package_manager() {
-	if command -v apt &> /dev/null; then
-		echo "apt"
-	elif command -v pacman &> /dev/null; then
+	# Try to detect from /etc/os-release first for accuracy
+	if [[ -f /etc/os-release ]]; then
+		source /etc/os-release
+		case "${ID_LIKE:-$ID}" in
+			*arch*)
+				echo "pacman"
+				return 0
+				;;
+			*debian*|*ubuntu*)
+				echo "apt"
+				return 0
+				;;
+			*rhel*|*fedora*|*centos*)
+				if command -v dnf &> /dev/null; then
+					echo "dnf"
+				else
+					echo "yum"
+				fi
+				return 0
+				;;
+		esac
+	fi
+
+	# Fallback to command detection
+	if command -v pacman &> /dev/null; then
 		echo "pacman"
+	elif command -v apt &> /dev/null; then
+		echo "apt"
 	elif command -v dnf &> /dev/null; then
 		echo "dnf"
+	elif command -v yum &> /dev/null; then
+		echo "yum"
+	elif command -v zypper &> /dev/null; then
+		echo "zypper"
 	else
 		echo "unknown"
 	fi
+}
+
+# Get OS distribution ID
+function get_os_id() {
+	if [[ -f /etc/os-release ]]; then
+		source /etc/os-release
+		echo "${ID}"
+	else
+		echo "unknown"
+	fi
+}
+
+# Check if running on a specific distro
+function is_distro() {
+	local distro="$1"
+	[[ "$(get_os_id)" == "$distro" ]]
 }
 
 # load global devbox

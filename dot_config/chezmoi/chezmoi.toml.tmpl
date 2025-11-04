@@ -5,6 +5,12 @@
     name = "Kevin Zehnder"
     github_user = "kevinzehnder"
 
+    # System information (auto-detected)
+    os = "{{ .chezmoi.os }}"
+    osid = "{{ .chezmoi.osRelease.id }}"
+    arch = "{{ .chezmoi.arch }}"
+    hostname = "{{ .chezmoi.hostname }}"
+
 # --- Examples for future use ---
 
 # Example of how to configure the editor used by `chezmoi edit`
