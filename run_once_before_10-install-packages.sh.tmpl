@@ -1,335 +1,335 @@
-# #!/bin/bash
-# {{- /* vim: set filetype=bash: */ -}}
-# # run_once_before_install-packages.sh.tmpl
-# # Unified bootstrap script for chezmoi dotfiles
-# # Supports: Arch, Ubuntu, Debian, RHEL, AlmaLinux, Rocky, Fedora
-# # This script runs once when chezmoi apply is first executed.
-#
-# set -e  # Exit on error
-# set -o pipefail  # Catch errors in pipes
-#
-# # --- Colors ---
-# GREEN='\033[0;32m'
-# YELLOW='\033[0;33m'
-# RED='\033[0;31m'
-# BLUE='\033[0;34m'
-# NC='\033[0m'
-#
-# # --- Detect OS ---
-# {{- $osID := .chezmoi.osRelease.id | lower -}}
-# {{- $os := .chezmoi.os -}}
-# {{- $arch := .chezmoi.arch -}}
-#
-# OS_ID="{{ $osID }}"
-# OS="{{ $os }}"
-# ARCH="{{ $arch }}"
-#
-# echo -e "${BLUE}========================================${NC}"
-# echo -e "${BLUE}Chezmoi Bootstrap Script${NC}"
-# echo -e "${BLUE}========================================${NC}"
-# echo -e "${YELLOW}OS: ${OS} (${OS_ID})${NC}"
-# echo -e "${YELLOW}Architecture: ${ARCH}${NC}"
-# echo -e "${BLUE}========================================${NC}"
-#
-# # --- Validate OS Support ---
-# {{- if eq $os "linux" }}
-#   {{- if or (eq $osID "arch") (eq $osID "ubuntu") (eq $osID "debian") (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
-#     # Supported OS
-#   {{- else }}
-# echo -e "${RED}Warning: OS '${OS_ID}' is not officially supported by this bootstrap script.${NC}"
-# echo -e "${YELLOW}Supported: Arch, Ubuntu, Debian, RHEL, AlmaLinux, Rocky, CentOS, Fedora${NC}"
-# exit 0
-#   {{- end }}
-# {{- else }}
-# echo -e "${RED}This bootstrap script is designed for Linux only.${NC}"
-# echo -e "${YELLOW}Detected OS: ${OS}${NC}"
-# exit 0
-# {{- end }}
-#
-# # --- Helper Functions ---
-#
-# # Sets ZSH as the default shell for a user
-# set_default_shell() {
-#     local user_to_set_shell_for="$1"
-#     local shell_path
-#
-#     # Check if zsh is installed
-#     if ! command -v zsh &> /dev/null; then
-#         echo -e "${YELLOW}ZSH not found, skipping shell change${NC}"
-#         return 0
-#     fi
-#
-#     shell_path=$(command -v zsh)
-#
-#     echo -e "${YELLOW}Setting ZSH as default shell for user '$user_to_set_shell_for'...${NC}"
-#
-#     local current_shell
-#     current_shell=$(getent passwd "$user_to_set_shell_for" | cut -d: -f7)
-#
-#     if [ "$current_shell" != "$shell_path" ]; then
-#         if [ "$EUID" -eq 0 ]; then
-#             chsh -s "$shell_path" "$user_to_set_shell_for"
-#         else
-#             sudo chsh -s "$shell_path" "$user_to_set_shell_for"
-#         fi
-#         echo -e "${GREEN}✓ Default shell for '$user_to_set_shell_for' set to ZSH${NC}"
-#     else
-#         echo -e "${GREEN}✓ ZSH is already the default shell for '$user_to_set_shell_for'${NC}"
-#     fi
-# }
-#
-# # Run command with or without sudo based on EUID
-# run_privileged() {
-#     if [ "$EUID" -eq 0 ]; then
-#         "$@"
-#     else
-#         sudo "$@"
-#     fi
-# }
-#
-# # Install Starship prompt via curl script
-# install_starship_via_script() {
-#     if command -v starship &> /dev/null; then
-#         echo -e "${GREEN}✓ Starship already installed${NC}"
-#         return 0
-#     fi
-#
-#     # Check if curl is available
-#     if ! command -v curl &> /dev/null; then
-#         echo -e "${YELLOW}curl not found, skipping Starship installation${NC}"
-#         return 0
-#     fi
-#
-#     echo -e "${YELLOW}Installing Starship prompt...${NC}"
-#     if [ "$EUID" -eq 0 ]; then
-#         curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-#     else
-#         curl -fsSL https://starship.rs/install.sh | sudo sh -s -- -y
-#     fi
-#
-#     if command -v starship &> /dev/null; then
-#         echo -e "${GREEN}✓ Starship installed${NC}"
-#     else
-#         echo -e "${YELLOW}Starship installation may have failed${NC}"
-#     fi
-# }
-#
-# {{- if eq $osID "arch" }}
-# # --- Arch Linux Functions ---
-#
-# install_arch_packages() {
-#     echo -e "${YELLOW}Updating system and installing packages (Arch Linux)...${NC}"
-#
-#     local packages=(
-#         {{- range .packages.common }}
-#         "{{ . }}"
-#         {{- end }}
-#         {{- range .packages.arch.core }}
-#         "{{ . }}"
-#         {{- end }}
-#         {{- range .packages.arch.tools }}
-#         "{{ . }}"
-#         {{- end }}
-#     )
-#
-#     echo -e "${BLUE}Packages to install: ${#packages[@]}${NC}"
-#
-#     run_privileged pacman -Syu --needed --noconfirm "${packages[@]}"
-#     echo -e "${GREEN}✓ Packages installed successfully${NC}"
-# }
-#
-# install_aur_helper() {
-#     local aur_helper="{{ .packages.arch.aur_helper }}"
-#
-#     if command -v "$aur_helper" &> /dev/null; then
-#         echo -e "${GREEN}✓ AUR helper ($aur_helper) already installed${NC}"
-#         return 0
-#     fi
-#
-#     echo -e "${YELLOW}Installing AUR helper ($aur_helper)...${NC}"
-#     local real_user="$1"
-#
-#     rm -rf /tmp/"$aur_helper"
-#     git clone "https://aur.archlinux.org/${aur_helper}.git" /tmp/"$aur_helper"
-#
-#     if [ "$EUID" -eq 0 ]; then
-#         if [ -z "$real_user" ] || [ "$real_user" == "root" ]; then
-#             echo -e "${YELLOW}Cannot build AUR packages as root. Skipping '$aur_helper' installation.${NC}"
-#             rm -rf /tmp/"$aur_helper"
-#             return 1
-#         fi
-#         chown -R "$real_user:$real_user" /tmp/"$aur_helper"
-#         sudo -u "$real_user" bash -c "cd /tmp/${aur_helper} && makepkg -si --noconfirm"
-#     else
-#         (cd /tmp/"$aur_helper" && makepkg -si --noconfirm)
-#     fi
-#
-#     rm -rf /tmp/"$aur_helper"
-#     echo -e "${GREEN}✓ $aur_helper installed successfully${NC}"
-# }
-#
-# bootstrap_arch() {
-#     local user="$1"
-#     install_arch_packages
-#     install_aur_helper "$user"
-#     set_default_shell "$user"
-# }
-#
-# {{- else if or (eq $osID "ubuntu") (eq $osID "debian") }}
-# # --- Ubuntu/Debian Functions ---
-#
-# enable_ubuntu_universe() {
-#     {{- if eq $osID "ubuntu" }}
-#     if ! grep -q "^deb.*universe" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
-#         echo -e "${YELLOW}Enabling Ubuntu Universe repository...${NC}"
-#         run_privileged add-apt-repository universe -y
-#         run_privileged apt update
-#         echo -e "${GREEN}✓ Universe repository enabled${NC}"
-#     else
-#         echo -e "${GREEN}✓ Universe repository already enabled${NC}"
-#     fi
-#     {{- end }}
-# }
-#
-# install_apt_packages() {
-#     echo -e "${YELLOW}Updating system and installing packages ({{ $osID | title }})...${NC}"
-#
-#     # Enable Universe repo on Ubuntu
-#     {{- if eq $osID "ubuntu" }}
-#     enable_ubuntu_universe
-#     {{- end }}
-#
-#     local packages=(
-#         {{- range .packages.common }}
-#         "{{ . }}"
-#         {{- end }}
-#         {{- range (index .packages $osID).core }}
-#         "{{ . }}"
-#         {{- end }}
-#         {{- range (index .packages $osID).tools }}
-#         "{{ . }}"
-#         {{- end }}
-#     )
-#
-#     echo -e "${BLUE}Packages to install: ${#packages[@]}${NC}"
-#
-#     run_privileged apt update
-#     run_privileged apt install -y "${packages[@]}"
-#     echo -e "${GREEN}✓ Packages installed successfully${NC}"
-# }
-#
-# install_manual_tools_debian() {
-#     echo -e "${YELLOW}Installing tools not available in apt repositories...${NC}"
-#
-#     # Install starship
-#     install_starship_via_script
-#
-#     # Install eza
-#     if ! command -v eza &> /dev/null; then
-#         echo -e "${YELLOW}Installing eza...${NC}"
-#         run_privileged mkdir -p /etc/apt/keyrings
-#         wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | run_privileged gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-#         echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | run_privileged tee /etc/apt/sources.list.d/gierens.list
-#         run_privileged chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-#         run_privileged apt update
-#         run_privileged apt install -y eza
-#         echo -e "${GREEN}✓ eza installed${NC}"
-#     else
-#         echo -e "${GREEN}✓ eza already installed${NC}"
-#     fi
-#
-#     echo -e "${YELLOW}Note: Some tools (dust, duf, procs, navi) may need manual installation${NC}"
-#     echo -e "${YELLOW}Consider using cargo or downloading binaries from GitHub releases${NC}"
-# }
-#
-# bootstrap_debian() {
-#     local user="$1"
-#     install_apt_packages
-#     install_manual_tools_debian
-#     set_default_shell "$user"
-# }
-#
-# {{- else if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
-# # --- RHEL/AlmaLinux/Rocky/CentOS/Fedora Functions ---
-#
-# install_rpm_packages() {
-#     echo -e "${YELLOW}Updating system and installing packages ({{ $osID | title }})...${NC}"
-#
-#     local packages=(
-#         {{- range .packages.common }}
-#         "{{ . }}"
-#         {{- end }}
-#         {{- range (index .packages $osID).core }}
-#         "{{ . }}"
-#         {{- end }}
-#         {{- range (index .packages $osID).tools }}
-#         "{{ . }}"
-#         {{- end }}
-#     )
-#
-#     echo -e "${BLUE}Packages to install: ${#packages[@]}${NC}"
-#
-#     # Determine package manager
-#     local pkg_mgr="dnf"
-#     if ! command -v dnf &> /dev/null; then
-#         pkg_mgr="yum"
-#     fi
-#
-#     echo -e "${YELLOW}Using package manager: $pkg_mgr${NC}"
-#
-#     run_privileged "$pkg_mgr" update -y
-#     run_privileged "$pkg_mgr" install -y "${packages[@]}"
-#
-#     # Update again after EPEL installation (for RHEL-based)
-#     {{- if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") }}
-#     run_privileged "$pkg_mgr" update -y
-#     {{- end }}
-#
-#     echo -e "${GREEN}✓ Packages installed successfully${NC}"
-# }
-#
-# install_manual_tools_rhel() {
-#     echo -e "${YELLOW}Installing tools not available in repositories...${NC}"
-#
-#     # Install starship
-#     install_starship_via_script
-#
-#     echo -e "${YELLOW}Note: Some tools (eza, fd, dust, duf, procs, navi, bat, direnv)${NC}"
-#     echo -e "${YELLOW}may need manual installation via cargo or GitHub releases${NC}"
-# }
-#
-# bootstrap_rhel() {
-#     local user="$1"
-#     install_rpm_packages
-#     install_manual_tools_rhel
-#     set_default_shell "$user"
-# }
-#
-# {{- end }}
-#
-# # --- Main Execution ---
-#
-# echo -e "${YELLOW}Starting bootstrap for {{ $osID }}...${NC}"
-#
-# # Determine the user to configure
-# if [ "$EUID" -eq 0 ]; then
-#     REAL_USER="{{ .chezmoi.username }}"
-#     echo -e "${YELLOW}Running as root. Target user: $REAL_USER${NC}"
-# else
-#     REAL_USER="$USER"
-#     echo -e "${YELLOW}Running as: $REAL_USER${NC}"
-# fi
-#
-# # Run OS-specific bootstrap
-# {{- if eq $osID "arch" }}
-# bootstrap_arch "$REAL_USER"
-# {{- else if or (eq $osID "ubuntu") (eq $osID "debian") }}
-# bootstrap_debian "$REAL_USER"
-# {{- else if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
-# bootstrap_rhel "$REAL_USER"
-# {{- end }}
-#
-# echo -e "${BLUE}========================================${NC}"
-# echo -e "${GREEN}✓ Bootstrap complete!${NC}"
-# echo -e "${YELLOW}Please restart your shell to use ZSH${NC}"
-# echo -e "${BLUE}========================================${NC}"
+#!/bin/bash
+{{- /* vim: set filetype=bash: */ -}}
+# run_once_before_install-packages.sh.tmpl
+# Unified bootstrap script for chezmoi dotfiles
+# Supports: Arch, Ubuntu, Debian, RHEL, AlmaLinux, Rocky, Fedora
+# This script runs once when chezmoi apply is first executed.
+
+set -e  # Exit on error
+set -o pipefail  # Catch errors in pipes
+
+# --- Colors ---
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# --- Detect OS ---
+{{- $osID := .chezmoi.osRelease.id | lower -}}
+{{- $os := .chezmoi.os -}}
+{{- $arch := .chezmoi.arch -}}
+
+OS_ID="{{ $osID }}"
+OS="{{ $os }}"
+ARCH="{{ $arch }}"
+
+echo -e "${BLUE}========================================${NC}"
+echo -e "${BLUE}Chezmoi Bootstrap Script${NC}"
+echo -e "${BLUE}========================================${NC}"
+echo -e "${YELLOW}OS: ${OS} (${OS_ID})${NC}"
+echo -e "${YELLOW}Architecture: ${ARCH}${NC}"
+echo -e "${BLUE}========================================${NC}"
+
+# --- Validate OS Support ---
+{{- if eq $os "linux" }}
+  {{- if or (eq $osID "arch") (eq $osID "ubuntu") (eq $osID "debian") (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
+    # Supported OS
+  {{- else }}
+echo -e "${RED}Warning: OS '${OS_ID}' is not officially supported by this bootstrap script.${NC}"
+echo -e "${YELLOW}Supported: Arch, Ubuntu, Debian, RHEL, AlmaLinux, Rocky, CentOS, Fedora${NC}"
+exit 0
+  {{- end }}
+{{- else }}
+echo -e "${RED}This bootstrap script is designed for Linux only.${NC}"
+echo -e "${YELLOW}Detected OS: ${OS}${NC}"
+exit 0
+{{- end }}
+
+# --- Helper Functions ---
+
+# Sets ZSH as the default shell for a user
+set_default_shell() {
+    local user_to_set_shell_for="$1"
+    local shell_path
+
+    # Check if zsh is installed
+    if ! command -v zsh &> /dev/null; then
+        echo -e "${YELLOW}ZSH not found, skipping shell change${NC}"
+        return 0
+    fi
+
+    shell_path=$(command -v zsh)
+
+    echo -e "${YELLOW}Setting ZSH as default shell for user '$user_to_set_shell_for'...${NC}"
+
+    local current_shell
+    current_shell=$(getent passwd "$user_to_set_shell_for" | cut -d: -f7)
+
+    if [ "$current_shell" != "$shell_path" ]; then
+        if [ "$EUID" -eq 0 ]; then
+            chsh -s "$shell_path" "$user_to_set_shell_for"
+        else
+            sudo chsh -s "$shell_path" "$user_to_set_shell_for"
+        fi
+        echo -e "${GREEN}✓ Default shell for '$user_to_set_shell_for' set to ZSH${NC}"
+    else
+        echo -e "${GREEN}✓ ZSH is already the default shell for '$user_to_set_shell_for'${NC}"
+    fi
+}
+
+# Run command with or without sudo based on EUID
+run_privileged() {
+    if [ "$EUID" -eq 0 ]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
+# Install Starship prompt via curl script
+install_starship_via_script() {
+    if command -v starship &> /dev/null; then
+        echo -e "${GREEN}✓ Starship already installed${NC}"
+        return 0
+    fi
+
+    # Check if curl is available
+    if ! command -v curl &> /dev/null; then
+        echo -e "${YELLOW}curl not found, skipping Starship installation${NC}"
+        return 0
+    fi
+
+    echo -e "${YELLOW}Installing Starship prompt...${NC}"
+    if [ "$EUID" -eq 0 ]; then
+        curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+    else
+        curl -fsSL https://starship.rs/install.sh | sudo sh -s -- -y
+    fi
+
+    if command -v starship &> /dev/null; then
+        echo -e "${GREEN}✓ Starship installed${NC}"
+    else
+        echo -e "${YELLOW}Starship installation may have failed${NC}"
+    fi
+}
+
+{{- if eq $osID "arch" }}
+# --- Arch Linux Functions ---
+
+install_arch_packages() {
+    echo -e "${YELLOW}Updating system and installing packages (Arch Linux)...${NC}"
+
+    local packages=(
+        {{- range .packages.common }}
+        "{{ . }}"
+        {{- end }}
+        {{- range .packages.arch.core }}
+        "{{ . }}"
+        {{- end }}
+        {{- range .packages.arch.tools }}
+        "{{ . }}"
+        {{- end }}
+    )
+
+    echo -e "${BLUE}Packages to install: ${#packages[@]}${NC}"
+
+    run_privileged pacman -Syu --needed --noconfirm "${packages[@]}"
+    echo -e "${GREEN}✓ Packages installed successfully${NC}"
+}
+
+install_aur_helper() {
+    local aur_helper="{{ .packages.arch.aur_helper }}"
+
+    if command -v "$aur_helper" &> /dev/null; then
+        echo -e "${GREEN}✓ AUR helper ($aur_helper) already installed${NC}"
+        return 0
+    fi
+
+    echo -e "${YELLOW}Installing AUR helper ($aur_helper)...${NC}"
+    local real_user="$1"
+
+    rm -rf /tmp/"$aur_helper"
+    git clone "https://aur.archlinux.org/${aur_helper}.git" /tmp/"$aur_helper"
+
+    if [ "$EUID" -eq 0 ]; then
+        if [ -z "$real_user" ] || [ "$real_user" == "root" ]; then
+            echo -e "${YELLOW}Cannot build AUR packages as root. Skipping '$aur_helper' installation.${NC}"
+            rm -rf /tmp/"$aur_helper"
+            return 1
+        fi
+        chown -R "$real_user:$real_user" /tmp/"$aur_helper"
+        sudo -u "$real_user" bash -c "cd /tmp/${aur_helper} && makepkg -si --noconfirm"
+    else
+        (cd /tmp/"$aur_helper" && makepkg -si --noconfirm)
+    fi
+
+    rm -rf /tmp/"$aur_helper"
+    echo -e "${GREEN}✓ $aur_helper installed successfully${NC}"
+}
+
+bootstrap_arch() {
+    local user="$1"
+    install_arch_packages
+    install_aur_helper "$user"
+    set_default_shell "$user"
+}
+
+{{- else if or (eq $osID "ubuntu") (eq $osID "debian") }}
+# --- Ubuntu/Debian Functions ---
+
+enable_ubuntu_universe() {
+    {{- if eq $osID "ubuntu" }}
+    if ! grep -q "^deb.*universe" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
+        echo -e "${YELLOW}Enabling Ubuntu Universe repository...${NC}"
+        run_privileged add-apt-repository universe -y
+        run_privileged apt update
+        echo -e "${GREEN}✓ Universe repository enabled${NC}"
+    else
+        echo -e "${GREEN}✓ Universe repository already enabled${NC}"
+    fi
+    {{- end }}
+}
+
+install_apt_packages() {
+    echo -e "${YELLOW}Updating system and installing packages ({{ $osID | title }})...${NC}"
+
+    # Enable Universe repo on Ubuntu
+    {{- if eq $osID "ubuntu" }}
+    enable_ubuntu_universe
+    {{- end }}
+
+    local packages=(
+        {{- range .packages.common }}
+        "{{ . }}"
+        {{- end }}
+        {{- range (index .packages $osID).core }}
+        "{{ . }}"
+        {{- end }}
+        {{- range (index .packages $osID).tools }}
+        "{{ . }}"
+        {{- end }}
+    )
+
+    echo -e "${BLUE}Packages to install: ${#packages[@]}${NC}"
+
+    run_privileged apt update
+    run_privileged apt install -y "${packages[@]}"
+    echo -e "${GREEN}✓ Packages installed successfully${NC}"
+}
+
+install_manual_tools_debian() {
+    echo -e "${YELLOW}Installing tools not available in apt repositories...${NC}"
+
+    # Install starship
+    install_starship_via_script
+
+    # Install eza
+    if ! command -v eza &> /dev/null; then
+        echo -e "${YELLOW}Installing eza...${NC}"
+        run_privileged mkdir -p /etc/apt/keyrings
+        wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | run_privileged gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | run_privileged tee /etc/apt/sources.list.d/gierens.list
+        run_privileged chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+        run_privileged apt update
+        run_privileged apt install -y eza
+        echo -e "${GREEN}✓ eza installed${NC}"
+    else
+        echo -e "${GREEN}✓ eza already installed${NC}"
+    fi
+
+    echo -e "${YELLOW}Note: Some tools (dust, duf, procs, navi) may need manual installation${NC}"
+    echo -e "${YELLOW}Consider using cargo or downloading binaries from GitHub releases${NC}"
+}
+
+bootstrap_debian() {
+    local user="$1"
+    install_apt_packages
+    install_manual_tools_debian
+    set_default_shell "$user"
+}
+
+{{- else if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
+# --- RHEL/AlmaLinux/Rocky/CentOS/Fedora Functions ---
+
+install_rpm_packages() {
+    echo -e "${YELLOW}Updating system and installing packages ({{ $osID | title }})...${NC}"
+
+    local packages=(
+        {{- range .packages.common }}
+        "{{ . }}"
+        {{- end }}
+        {{- range (index .packages $osID).core }}
+        "{{ . }}"
+        {{- end }}
+        {{- range (index .packages $osID).tools }}
+        "{{ . }}"
+        {{- end }}
+    )
+
+    echo -e "${BLUE}Packages to install: ${#packages[@]}${NC}"
+
+    # Determine package manager
+    local pkg_mgr="dnf"
+    if ! command -v dnf &> /dev/null; then
+        pkg_mgr="yum"
+    fi
+
+    echo -e "${YELLOW}Using package manager: $pkg_mgr${NC}"
+
+    run_privileged "$pkg_mgr" update -y
+    run_privileged "$pkg_mgr" install -y "${packages[@]}"
+
+    # Update again after EPEL installation (for RHEL-based)
+    {{- if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") }}
+    run_privileged "$pkg_mgr" update -y
+    {{- end }}
+
+    echo -e "${GREEN}✓ Packages installed successfully${NC}"
+}
+
+install_manual_tools_rhel() {
+    echo -e "${YELLOW}Installing tools not available in repositories...${NC}"
+
+    # Install starship
+    install_starship_via_script
+
+    echo -e "${YELLOW}Note: Some tools (eza, fd, dust, duf, procs, navi, bat, direnv)${NC}"
+    echo -e "${YELLOW}may need manual installation via cargo or GitHub releases${NC}"
+}
+
+bootstrap_rhel() {
+    local user="$1"
+    install_rpm_packages
+    install_manual_tools_rhel
+    set_default_shell "$user"
+}
+
+{{- end }}
+
+# --- Main Execution ---
+
+echo -e "${YELLOW}Starting bootstrap for {{ $osID }}...${NC}"
+
+# Determine the user to configure
+if [ "$EUID" -eq 0 ]; then
+    REAL_USER="{{ .chezmoi.username }}"
+    echo -e "${YELLOW}Running as root. Target user: $REAL_USER${NC}"
+else
+    REAL_USER="$USER"
+    echo -e "${YELLOW}Running as: $REAL_USER${NC}"
+fi
+
+# Run OS-specific bootstrap
+{{- if eq $osID "arch" }}
+bootstrap_arch "$REAL_USER"
+{{- else if or (eq $osID "ubuntu") (eq $osID "debian") }}
+bootstrap_debian "$REAL_USER"
+{{- else if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
+bootstrap_rhel "$REAL_USER"
+{{- end }}
+
+echo -e "${BLUE}========================================${NC}"
+echo -e "${GREEN}✓ Bootstrap complete!${NC}"
+echo -e "${YELLOW}Please restart your shell to use ZSH${NC}"
+echo -e "${BLUE}========================================${NC}"
