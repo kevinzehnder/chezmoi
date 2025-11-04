@@ -58,6 +58,13 @@ set_default_shell() {
         return 0
     fi
 
+    # Check if chsh is available
+    if ! command -v chsh &> /dev/null; then
+        echo -e "${YELLOW}chsh command not found, skipping shell change${NC}"
+        echo -e "${YELLOW}You may need to install util-linux package or manually change shell${NC}"
+        return 0
+    fi
+
     shell_path=$(command -v zsh)
 
     echo -e "${YELLOW}Setting ZSH as default shell for user '$user_to_set_shell_for'...${NC}"

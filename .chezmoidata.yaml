@@ -21,6 +21,7 @@ packages:
       - base-devel
       - sudo
       - which
+      - util-linux
       - go
     tools:
       - direnv
