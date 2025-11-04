@@ -244,8 +244,8 @@ install_manual_tools_debian() {
         echo -e "${GREEN}✓ eza already installed${NC}"
     fi
 
-    echo -e "${YELLOW}Note: Some tools (dust, duf, procs, navi) may need manual installation${NC}"
-    echo -e "${YELLOW}Consider using cargo or downloading binaries from GitHub releases${NC}"
+    echo -e "${YELLOW}Note: Additional tools (dust, duf, procs, navi, bat, fd) will be${NC}"
+    echo -e "${YELLOW}automatically installed via zinit when you start ZSH${NC}"
 }
 
 bootstrap_debian() {
@@ -300,8 +300,8 @@ install_manual_tools_rhel() {
     # Install starship
     install_starship_via_script
 
-    echo -e "${YELLOW}Note: Some tools (eza, fd, dust, duf, procs, navi, bat, direnv)${NC}"
-    echo -e "${YELLOW}may need manual installation via cargo or GitHub releases${NC}"
+    echo -e "${YELLOW}Note: Additional tools (eza, fd, dust, duf, procs, navi, bat, direnv) will be${NC}"
+    echo -e "${YELLOW}automatically installed via zinit when you start ZSH${NC}"
 }
 
 bootstrap_rhel() {
