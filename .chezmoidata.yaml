@@ -1,0 +1,207 @@
+# .chezmoidata.yaml
+# OS-specific package mappings for chezmoi bootstrap
+# This file centralizes package definitions across different distributions
+
+# Version configuration
+versions:
+  go: "1.24.1"
+
+# Common packages across all distributions
+packages:
+  common:
+    - git
+    - zsh
+    - unzip
+    - curl
+    - wget
+
+  # Arch Linux packages
+  arch:
+    core:
+      - base-devel
+      - sudo
+      - which
+      - go
+    tools:
+      - direnv
+      - eza
+      - fd
+      - fzf
+      - navi
+      - procs
+      - ripgrep
+      - dust
+      - duf
+      - bat
+      - starship
+    aur_helper: yay
+
+  # Ubuntu/Debian packages
+  ubuntu:
+    core:
+      - build-essential
+      - sudo
+      - golang-go
+    tools:
+      - direnv
+      - fd-find
+      - fzf
+      - ripgrep
+      - bat
+    # Tools that need alternative installation (snap/cargo/binary)
+    manual:
+      - eza
+      - dust
+      - duf
+      - procs
+      - navi
+      - starship
+
+  # Debian (similar to Ubuntu but may have different package names)
+  debian:
+    core:
+      - build-essential
+      - sudo
+      - golang-go
+    tools:
+      - direnv
+      - fd-find
+      - fzf
+      - ripgrep
+      - bat
+    manual:
+      - eza
+      - dust
+      - duf
+      - procs
+      - navi
+      - starship
+
+  # RHEL/AlmaLinux/Rocky/CentOS packages
+  rhel:
+    core:
+      - epel-release
+      - sudo
+      - which
+      - golang
+      - make
+      - gcc
+      - gcc-c++
+    tools:
+      - fzf
+      - ripgrep
+    manual:
+      - direnv
+      - eza
+      - fd
+      - dust
+      - duf
+      - procs
+      - navi
+      - bat
+      - starship
+
+  # AlmaLinux (inherits from RHEL)
+  almalinux:
+    core:
+      - epel-release
+      - sudo
+      - which
+      - golang
+      - make
+      - gcc
+      - gcc-c++
+    tools:
+      - fzf
+      - ripgrep
+    manual:
+      - direnv
+      - eza
+      - fd
+      - dust
+      - duf
+      - procs
+      - navi
+      - bat
+      - starship
+
+  # Rocky Linux (inherits from RHEL)
+  rocky:
+    core:
+      - epel-release
+      - sudo
+      - which
+      - golang
+      - make
+      - gcc
+      - gcc-c++
+    tools:
+      - fzf
+      - ripgrep
+    manual:
+      - direnv
+      - eza
+      - fd
+      - dust
+      - duf
+      - procs
+      - navi
+      - bat
+      - starship
+
+  # Fedora packages
+  fedora:
+    core:
+      - sudo
+      - which
+      - golang
+      - make
+      - gcc
+      - gcc-c++
+      - "@development-tools"
+    tools:
+      - direnv
+      - fd-find
+      - fzf
+      - ripgrep
+      - bat
+      - eza
+      - dust
+      - procs
+    manual:
+      - duf
+      - navi
+      - starship
+
+# Package manager mappings
+package_managers:
+  arch: pacman
+  ubuntu: apt
+  debian: apt
+  rhel: dnf
+  almalinux: dnf
+  rocky: dnf
+  centos: dnf
+  fedora: dnf
+
+# Alternative package managers (fallback)
+package_managers_fallback:
+  rhel: yum
+  almalinux: yum
+  rocky: yum
+  centos: yum
+
+# AUR helpers by distro
+aur_helpers:
+  arch: yay
+
+# Starship installation methods by distro
+starship_install:
+  arch: package  # Available via pacman
+  ubuntu: script # Needs curl install script
+  debian: script
+  rhel: script
+  almalinux: script
+  rocky: script
+  centos: script
+  fedora: script
