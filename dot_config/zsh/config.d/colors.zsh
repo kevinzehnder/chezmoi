@@ -9,29 +9,35 @@ function colorschemeswitcher() {
 
 		export BASE16_THEME="solarized-light"
 		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
-		
+
 		export BAT_THEME="gruvbox-light"
-		export LS_COLORS="$(vivid generate solarized-light)"
+		if command -v vivid >/dev/null 2>&1; then
+			export LS_COLORS="$(vivid generate solarized-light)"
+		fi
 		change_zellij_theme "solarized-light"
 		change_k9s_theme "solarized_light"
 	elif [ "$1" = "gruvbox" ]; then
 		rm -f ~/.lightmode
-		
+
 		export BASE16_THEME="gruvbox-dark"
 		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
 
 		export BAT_THEME="gruvbox-dark"
-		export LS_COLORS="$(vivid generate gruvbox-dark)"
+		if command -v vivid >/dev/null 2>&1; then
+			export LS_COLORS="$(vivid generate gruvbox-dark)"
+		fi
 		change_zellij_theme "gruvbox"
 	else
 		rm -f ~/.lightmode
-		
+
 		# fzf
 		export BASE16_THEME="tokyo-night-storm"
 		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
 
 		export BAT_THEME="ansi"
-		export LS_COLORS="$(vivid generate tokyonight-storm)"
+		if command -v vivid >/dev/null 2>&1; then
+			export LS_COLORS="$(vivid generate tokyonight-storm)"
+		fi
 		change_zellij_theme "tokyo-night-dark"
 		change_k9s_theme "nord"
 	fi
@@ -39,7 +45,7 @@ function colorschemeswitcher() {
 
 function change_zellij_theme() {
 	if [ "$#" -ne 1 ]; then
-		echo "Usage: change_zellij_theme <new-theme>"
+		echo "Usage: change_zellij_theme <new-theme>" >&2
 		return 1
 	fi
 
@@ -47,37 +53,50 @@ function change_zellij_theme() {
 	NEW_THEME="$1"
 
 	if [ ! -f "$CONFIG_FILE" ]; then
-		echo "Configuration file not found: $CONFIG_FILE"
-		return 1
+		# Silently skip if config doesn't exist
+		return 0
 	fi
 
-	# Use sed to replace the theme line
-	sed -i.bak "s/^theme \".*\"$/theme \"$NEW_THEME\"/" "$CONFIG_FILE"
+	if command -v sed >/dev/null 2>&1; then
+		# Use sed to replace the theme line
+		sed -i.bak "s/^theme \".*\"$/theme \"$NEW_THEME\"/" "$CONFIG_FILE"
+	fi
 }
 
 function change_k9s_theme() {
 	if [ "$#" -ne 1 ]; then
-		echo "Usage: change_k9s_theme <new-theme>"
+		echo "Usage: change_k9s_theme <new-theme>" >&2
 		return 1
 	fi
 	CONFIG_FILE="$HOME/.config/k9s/config.yaml"
 	NEW_THEME="$1"
 
 	if [ ! -f "$CONFIG_FILE" ]; then
-		echo "Configuration file not found: $CONFIG_FILE"
-		return 1
+		# Silently skip if config doesn't exist
+		return 0
 	fi
 
-	# Use sed to replace the skin line, considering the nested structure
-	sed -i.bak 's/^ *skin: .*$/    skin: '"$NEW_THEME"'/' "$CONFIG_FILE"
+	if command -v sed >/dev/null 2>&1; then
+		# Use sed to replace the skin line, considering the nested structure
+		sed -i.bak 's/^ *skin: .*$/    skin: '"$NEW_THEME"'/' "$CONFIG_FILE"
+	fi
 }
 
 function darkmodechecker() {
-	theme=$(gsettings get org.gnome.desktop.interface gtk-theme)
-	if [[ "$theme" == *Dark* ]]; then
-		dark
+	if command -v gsettings >/dev/null 2>&1; then
+		theme=$(gsettings get org.gnome.desktop.interface gtk-theme 2>/dev/null)
+		if [[ "$theme" == *Dark* ]]; then
+			dark
+		else
+			light
+		fi
 	else
-		light
+		# Fallback to file-based detection if gsettings is unavailable
+		if [[ -f ~/.lightmode ]]; then
+			light
+		else
+			dark
+		fi
 	fi
 }
 
