@@ -1,0 +1,28 @@
+#!/bin/bash
+{{- /* vim: set filetype=bash: */ -}}
+# run_once_after_install-devbox.sh.tmpl
+# Install DevBox - Portable development environments
+
+set -e
+
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+echo -e "${YELLOW}Checking DevBox installation...${NC}"
+
+if command -v devbox &> /dev/null; then
+    echo -e "${GREEN}✓ DevBox already installed: $(devbox version)${NC}"
+    exit 0
+fi
+
+echo -e "${YELLOW}Installing DevBox...${NC}"
+
+# Download and run installer
+curl -fsSL https://get.jetpack.io/devbox | bash -s -- -f
+
+if command -v devbox &> /dev/null; then
+    echo -e "${GREEN}✓ DevBox installed successfully: $(devbox version)${NC}"
+else
+    echo -e "${YELLOW}DevBox installation may require shell restart${NC}"
+fi

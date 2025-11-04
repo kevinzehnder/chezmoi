@@ -1,0 +1,96 @@
+#!/bin/bash
+{{- /* vim: set filetype=bash: */ -}}
+# run_once_after_install-golang.sh.tmpl
+# Install or update Go to specific version
+
+set -e
+
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+{{- $goVersion := .versions.go | default "1.24.1" }}
+{{- $arch := .chezmoi.arch }}
+{{- $goArch := $arch }}
+{{- if eq $arch "amd64" }}
+{{-   $goArch = "amd64"
+{{- else if eq $arch "arm64" }}
+{{-   $goArch = "arm64"
+{{- else if eq $arch "arm" }}
+{{-   $goArch = "armv6l"
+{{- end }}
+
+GO_VERSION="{{ $goVersion }}"
+GO_ARCH="{{ $goArch }}"
+GO_INSTALL_DIR="/usr/local/go"
+GO_BINARY="$GO_INSTALL_DIR/bin/go"
+
+echo -e "${BLUE}========================================${NC}"
+echo -e "${BLUE}Go Installation Manager${NC}"
+echo -e "${BLUE}========================================${NC}"
+echo -e "${YELLOW}Target version: ${GO_VERSION}${NC}"
+echo -e "${YELLOW}Architecture: ${GO_ARCH}${NC}"
+
+# Check if Go is already installed
+if [ -f "$GO_BINARY" ]; then
+    INSTALLED_VERSION=$($GO_BINARY version | awk '{print $3}' | sed 's/go//')
+    echo -e "${YELLOW}Currently installed: ${INSTALLED_VERSION}${NC}"
+
+    if [ "$INSTALLED_VERSION" = "$GO_VERSION" ]; then
+        echo -e "${GREEN}✓ Go ${GO_VERSION} is already installed${NC}"
+        exit 0
+    fi
+
+    echo -e "${YELLOW}Upgrading from ${INSTALLED_VERSION} to ${GO_VERSION}${NC}"
+fi
+
+# Run with sudo if not root
+run_privileged() {
+    if [ "$EUID" -eq 0 ]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
+# Download Go
+echo -e "${YELLOW}Downloading Go ${GO_VERSION} for ${GO_ARCH}...${NC}"
+GO_URL="https://go.dev/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
+GO_TARBALL="/tmp/go${GO_VERSION}.tar.gz"
+
+if ! curl -fsSL "$GO_URL" -o "$GO_TARBALL"; then
+    echo -e "${YELLOW}Failed to download Go. URL: ${GO_URL}${NC}"
+    exit 1
+fi
+
+# Remove existing installation
+if [ -d "$GO_INSTALL_DIR" ]; then
+    echo -e "${YELLOW}Removing existing Go installation...${NC}"
+    run_privileged rm -rf "$GO_INSTALL_DIR"
+fi
+
+# Extract new version
+echo -e "${YELLOW}Installing Go ${GO_VERSION}...${NC}"
+run_privileged tar -C /usr/local -xzf "$GO_TARBALL"
+
+# Clean up
+rm -f "$GO_TARBALL"
+
+# Verify installation
+if [ -f "$GO_BINARY" ]; then
+    INSTALLED_VERSION=$($GO_BINARY version | awk '{print $3}' | sed 's/go//')
+    echo -e "${GREEN}✓ Go ${INSTALLED_VERSION} installed successfully${NC}"
+    echo -e "${YELLOW}Location: ${GO_BINARY}${NC}"
+
+    # Check if Go is in PATH
+    if ! echo "$PATH" | grep -q "/usr/local/go/bin"; then
+        echo -e "${YELLOW}Note: Ensure /usr/local/go/bin is in your PATH${NC}"
+        echo -e "${YELLOW}This should be set in your ZSH config${NC}"
+    fi
+else
+    echo -e "${YELLOW}Installation completed but verification failed${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}========================================${NC}"
