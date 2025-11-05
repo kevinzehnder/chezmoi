@@ -14,7 +14,7 @@ Personal dotfiles managed by chezmoi with unified OS detection and package manag
 ## Bootstrap
 
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply kevinzehnder
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply kevinzehnder/chezmoi
 ```
 
 ## Structure
