@@ -135,7 +135,6 @@ install_starship_via_script() {
     fi
 }
 
-{{- if eq $osID "arch" }}
 # --- Arch Linux Functions ---
 
 install_arch_packages() {
@@ -196,11 +195,14 @@ bootstrap_arch() {
     set_default_shell "$user"
 }
 
-{{- else if or (eq $osID "ubuntu") (eq $osID "debian") }}
 # --- Ubuntu/Debian Functions ---
 
 enable_ubuntu_universe() {
-    {{- if eq $osID "ubuntu" }}
+    # Only for Ubuntu
+    if [ "$OS_ID" != "ubuntu" ]; then
+        return 0
+    fi
+
     if ! grep -q "^deb.*universe" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
         echo -e "${YELLOW}Enabling Ubuntu Universe repository...${NC}"
         run_privileged add-apt-repository universe -y
@@ -209,16 +211,15 @@ enable_ubuntu_universe() {
     else
         echo -e "${GREEN}✓ Universe repository already enabled${NC}"
     fi
-    {{- end }}
 }
 
 install_apt_packages() {
-    echo -e "${YELLOW}Updating system and installing packages ({{ $osID | title }})...${NC}"
+    echo -e "${YELLOW}Updating system and installing packages (${OS_ID^})...${NC}"
 
     # Enable Universe repo on Ubuntu
-    {{- if eq $osID "ubuntu" }}
-    enable_ubuntu_universe
-    {{- end }}
+    if [ "$OS_ID" = "ubuntu" ]; then
+        enable_ubuntu_universe
+    fi
 
     local packages=(
         {{- range .packages.common }}
@@ -270,11 +271,10 @@ bootstrap_debian() {
     set_default_shell "$user"
 }
 
-{{- else if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
 # --- RHEL/AlmaLinux/Rocky/CentOS/Fedora Functions ---
 
 install_rpm_packages() {
-    echo -e "${YELLOW}Updating system and installing packages ({{ $osID | title }})...${NC}"
+    echo -e "${YELLOW}Updating system and installing packages (${OS_ID^})...${NC}"
 
     local packages=(
         {{- range .packages.common }}
@@ -302,9 +302,11 @@ install_rpm_packages() {
     run_privileged "$pkg_mgr" install -y "${packages[@]}"
 
     # Update again after EPEL installation (for RHEL-based)
-    {{- if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") }}
-    run_privileged "$pkg_mgr" update -y
-    {{- end }}
+    case "$OS_ID" in
+        rhel|almalinux|rocky|centos)
+            run_privileged "$pkg_mgr" update -y
+            ;;
+    esac
 
     echo -e "${GREEN}✓ Packages installed successfully${NC}"
 }
@@ -325,8 +327,6 @@ bootstrap_rhel() {
     install_manual_tools_rhel
     set_default_shell "$user"
 }
-
-{{- end }}
 
 # --- Main Execution ---
 
