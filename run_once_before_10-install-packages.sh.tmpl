@@ -15,13 +15,25 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # --- Detect OS ---
-{{- $osID := .chezmoi.osRelease.id | lower -}}
+{{- $osID := "" -}}
 {{- $os := .chezmoi.os -}}
 {{- $arch := .chezmoi.arch -}}
+
+{{- if hasKey .chezmoi "osRelease" -}}
+{{- if hasKey .chezmoi.osRelease "id" -}}
+{{- $osID = .chezmoi.osRelease.id | lower -}}
+{{- end -}}
+{{- end -}}
 
 OS_ID="{{ $osID }}"
 OS="{{ $os }}"
 ARCH="{{ $arch }}"
+
+# Fallback: detect OS_ID from /etc/os-release if not set by template
+if [ -z "$OS_ID" ] && [ -f /etc/os-release ]; then
+    echo -e "${YELLOW}OS ID not detected by chezmoi, reading from /etc/os-release...${NC}"
+    OS_ID=$(grep -E "^ID=" /etc/os-release | cut -d= -f2 | tr -d '"' | tr '[:upper:]' '[:lower:]')
+fi
 
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}Chezmoi Bootstrap Script${NC}"
@@ -31,19 +43,22 @@ echo -e "${YELLOW}Architecture: ${ARCH}${NC}"
 echo -e "${BLUE}========================================${NC}"
 
 # --- Validate OS Support ---
-{{- if eq $os "linux" }}
-  {{- if or (eq $osID "arch") (eq $osID "ubuntu") (eq $osID "debian") (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
-    # Supported OS
-  {{- else }}
-echo -e "${RED}Warning: OS '${OS_ID}' is not officially supported by this bootstrap script.${NC}"
-echo -e "${YELLOW}Supported: Arch, Ubuntu, Debian, RHEL, AlmaLinux, Rocky, CentOS, Fedora${NC}"
-exit 0
-  {{- end }}
-{{- else }}
-echo -e "${RED}This bootstrap script is designed for Linux only.${NC}"
-echo -e "${YELLOW}Detected OS: ${OS}${NC}"
-exit 0
-{{- end }}
+if [ "$OS" != "linux" ]; then
+    echo -e "${RED}This bootstrap script is designed for Linux only.${NC}"
+    echo -e "${YELLOW}Detected OS: ${OS}${NC}"
+    exit 0
+fi
+
+case "$OS_ID" in
+    arch|ubuntu|debian|rhel|almalinux|rocky|centos|fedora)
+        echo -e "${GREEN}✓ Supported OS detected: $OS_ID${NC}"
+        ;;
+    *)
+        echo -e "${RED}Warning: OS '${OS_ID}' is not officially supported by this bootstrap script.${NC}"
+        echo -e "${YELLOW}Supported: Arch, Ubuntu, Debian, RHEL, AlmaLinux, Rocky, CentOS, Fedora${NC}"
+        exit 0
+        ;;
+esac
 
 # --- Helper Functions ---
 
@@ -315,7 +330,7 @@ bootstrap_rhel() {
 
 # --- Main Execution ---
 
-echo -e "${YELLOW}Starting bootstrap for {{ $osID }}...${NC}"
+echo -e "${YELLOW}Starting bootstrap for ${OS_ID}...${NC}"
 
 # Determine the user to configure
 if [ "$EUID" -eq 0 ]; then
@@ -327,13 +342,21 @@ else
 fi
 
 # Run OS-specific bootstrap
-{{- if eq $osID "arch" }}
-bootstrap_arch "$REAL_USER"
-{{- else if or (eq $osID "ubuntu") (eq $osID "debian") }}
-bootstrap_debian "$REAL_USER"
-{{- else if or (eq $osID "rhel") (eq $osID "almalinux") (eq $osID "rocky") (eq $osID "centos") (eq $osID "fedora") }}
-bootstrap_rhel "$REAL_USER"
-{{- end }}
+case "$OS_ID" in
+    arch)
+        bootstrap_arch "$REAL_USER"
+        ;;
+    ubuntu|debian)
+        bootstrap_debian "$REAL_USER"
+        ;;
+    rhel|almalinux|rocky|centos|fedora)
+        bootstrap_rhel "$REAL_USER"
+        ;;
+    *)
+        echo -e "${RED}No bootstrap function for OS: $OS_ID${NC}"
+        exit 1
+        ;;
+esac
 
 echo -e "${BLUE}========================================${NC}"
 echo -e "${GREEN}✓ Bootstrap complete!${NC}"
