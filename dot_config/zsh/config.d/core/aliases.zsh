@@ -32,7 +32,12 @@ alias svim='sudo -E nvim' # Use -E to preserve environment variables
 alias vim='nvim'
 alias cim='nvim'
 alias v='nvim' # Shorter alias for nvim
-alias neovide='nohup neovide.exe --wsl --neovim-bin $(which nvim) >/dev/null 2>&1 &'
+# Neovide (WSL-aware)
+if [[ -n "$WSL_DISTRO_NAME" ]]; then
+    alias neovide='nohup neovide.exe --wsl --neovim-bin $(which nvim) >/dev/null 2>&1 &'
+else
+    command -v neovide >/dev/null && alias neovide='nohup neovide --neovim-bin $(which nvim) >/dev/null 2>&1 &'
+fi
 alias zshrc='nvim ~/.zshrc'
 alias zshconf="nvim ~/.config/zsh/config.d"
 alias sshconf='nvim ~/.ssh/config'
