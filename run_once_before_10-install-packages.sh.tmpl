@@ -276,19 +276,25 @@ bootstrap_debian() {
 install_rpm_packages() {
     echo -e "${YELLOW}Updating system and installing packages (${OS_ID^})...${NC}"
 
-    local packages=(
+    local common_packages=(
         {{- range .packages.common }}
         "{{ . }}"
         {{- end }}
+    )
+
+    local core_packages=(
         {{- range (index .packages $osID).core }}
         "{{ . }}"
         {{- end }}
+    )
+
+    local tool_packages=(
         {{- range (index .packages $osID).tools }}
         "{{ . }}"
         {{- end }}
     )
 
-    echo -e "${BLUE}Packages to install: ${#packages[@]}${NC}"
+    echo -e "${BLUE}Packages to install: common=${#common_packages[@]}, core=${#core_packages[@]}, tools=${#tool_packages[@]}${NC}"
 
     # Determine package manager
     local pkg_mgr="dnf"
@@ -298,13 +304,23 @@ install_rpm_packages() {
 
     echo -e "${YELLOW}Using package manager: $pkg_mgr${NC}"
 
-    run_privileged "$pkg_mgr" update -y
-    run_privileged "$pkg_mgr" install -y "${packages[@]}"
-
-    # Update again after EPEL installation (for RHEL-based)
+    # For RHEL-based systems, install core packages (including EPEL) first
     case "$OS_ID" in
         rhel|almalinux|rocky|centos)
+            echo -e "${YELLOW}Installing core packages (including EPEL)...${NC}"
             run_privileged "$pkg_mgr" update -y
+            run_privileged "$pkg_mgr" install -y "${common_packages[@]}" "${core_packages[@]}"
+
+            echo -e "${YELLOW}Updating repository metadata after EPEL installation...${NC}"
+            run_privileged "$pkg_mgr" makecache
+
+            echo -e "${YELLOW}Installing tool packages from EPEL...${NC}"
+            run_privileged "$pkg_mgr" install -y "${tool_packages[@]}"
+            ;;
+        *)
+            # For Fedora, install all at once
+            run_privileged "$pkg_mgr" update -y
+            run_privileged "$pkg_mgr" install -y "${common_packages[@]}" "${core_packages[@]}" "${tool_packages[@]}"
             ;;
     esac
 
