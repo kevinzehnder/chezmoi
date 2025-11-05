@@ -40,7 +40,7 @@ zinit wait lucid as"program" from"gh-r" for \
 
 # needs to be loaded last
 zinit for \
-	atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+	atinit"zicompinit -C; zicdreplay" \
 	blockf \
 	zsh-users/zsh-autosuggestions
 
