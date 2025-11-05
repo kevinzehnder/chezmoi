@@ -17,11 +17,15 @@ ARCH=$(uname -m)
 if [[ "$ARCH" == "x86_64" ]]; then
 	zinit wait lucid as"program" from"gh-r" for \
 		go-task/task \
-		pick"bin/cb" Slackadays/Clipboard \
-		bpick"atuin-*.tar.gz" mv"atuin*/atuin -> atuin" atuinsh/atuin
+		pick"bin/cb" Slackadays/Clipboard
 fi
 
-{{- $osID := .chezmoi.osRelease.id | lower }}
+{{- $osID := "" }}
+{{- if hasKey .chezmoi "osRelease" }}
+{{- if hasKey .chezmoi.osRelease "id" }}
+{{- $osID = .chezmoi.osRelease.id | lower }}
+{{- end }}
+{{- end }}
 {{- if ne $osID "arch" }}
 # Non-Arch distros: Install CLI tools via zinit from GitHub releases
 # (On Arch, these are installed via pacman/AUR in the bootstrap script)
