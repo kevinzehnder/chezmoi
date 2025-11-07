@@ -1,3 +1,6 @@
+#
+# ZSH completion system configuration
+#
 
 # Custom completions directory setup
 COMPLETIONS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/completions"

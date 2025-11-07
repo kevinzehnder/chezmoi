@@ -33,7 +33,6 @@ setopt multios              # Implicit tees or cats when multiple redirections a
 setopt no_beep              # Don't beep on error.
 setopt prompt_subst         # Substitution of parameters inside the prompt each time the prompt is drawn.
 
-
 # Basic completion settings
 zstyle ':completion:*' completer _complete _match _approximate
 zstyle ':completion:*:match:*' original only
@@ -56,7 +55,7 @@ zstyle ':completion:*' group-name ''
 zstyle ':completion:*' verbose yes
 
 # Case insensitive matching and fuzzy matching
-# zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
 # Ignore specified patterns in completions
 zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
@@ -72,6 +71,3 @@ zstyle ':fzf-tab:*' fzf-flags --bind=tab:accept
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 zstyle ':fzf-tab:*' switch-group '<' '>'
 
-zmodload -i zsh/complist
-zstyle ':completion:*' use-cache yes
-zstyle ':completion:*' cache-path ~/.cache/zsh
