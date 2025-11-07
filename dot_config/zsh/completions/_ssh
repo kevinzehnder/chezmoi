@@ -10,15 +10,19 @@ _ssh_hosts() {
 
 # Main completion function for ssh
 _ssh_complete() {
-  local cur
-  cur="${words[-1]}"
+  local curcontext="$curcontext" state line
+  typeset -A opt_args
   
-  # Get the list of hosts
-  local hosts
-  hosts=($(_ssh_hosts))
+  _arguments -C \
+    '*:ssh host:->ssh_hosts'
   
-  # Use compadd to add the completions
-  compadd "$@" -- "${hosts[@]}"
+  case $state in
+    ssh_hosts)
+      local -a hosts
+      hosts=($(_ssh_hosts))
+      _describe -t hosts 'ssh hosts' hosts
+      ;;
+  esac
 }
 
 # Bind the completion function to the ssh command
