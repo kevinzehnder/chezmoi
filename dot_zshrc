@@ -13,15 +13,16 @@ source "${ZINIT_HOME}/zinit.zsh"
 # ZSH vi mode
 export ZVM_INIT_MODE=sourcing # vi mode for zsh
 
-# Core configuration files (order matters)
+# # Core configuration files (order matters)
 source "$HOME/.config/zsh/config.d/core/plugins.zsh"     # Zi plugins
 source "$HOME/.config/zsh/config.d/core/options.zsh"     # ZSH options
 source "$HOME/.config/zsh/config.d/core/environment.zsh" # Environment variables
 source "$HOME/.config/zsh/config.d/core/keybindings.zsh" # Key bindings
 source "$HOME/.config/zsh/config.d/core/completion.zsh"  # Completion system
 source "$HOME/.config/zsh/config.d/core/aliases.zsh"     # Aliases
+#
 
-# Load remaining config files
+# # Load remaining config files
 if [ -d "$HOME/.config/zsh/config.d/other/" ]; then
 	for conf in "$HOME/.config/zsh/config.d/other/"*.zsh; do
 		source "${conf}"
