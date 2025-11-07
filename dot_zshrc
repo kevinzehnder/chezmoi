@@ -22,18 +22,11 @@ source "$HOME/.config/zsh/config.d/core/completion.zsh"  # Completion system
 source "$HOME/.config/zsh/config.d/core/aliases.zsh"     # Aliases
 
 # Load remaining config files
-if [ -d "$HOME/.config/zsh/config.d/" ]; then
-	for conf in "$HOME/.config/zsh/config.d/"*.zsh; do
+if [ -d "$HOME/.config/zsh/config.d/other/" ]; then
+	for conf in "$HOME/.config/zsh/config.d/other/"*.zsh; do
 		source "${conf}"
 	done
 	unset conf
-fi
-
-# Load host-specific configuration if it exists
-HOSTNAME=$(hostname -s 2> /dev/null || uname -n)
-HOST_CONFIG="$HOME/.config/zsh/config.d/hosts/${HOSTNAME}.zsh"
-if [[ -f "$HOST_CONFIG" ]]; then
-	source "$HOST_CONFIG"
 fi
 
 # Load Atuin last
