@@ -75,6 +75,7 @@ _comp_if_needed "kubectl-argo-rollouts" "kubectl-argo-rollouts completion zsh"
 _comp_if_needed "uv" "uv generate-shell-completion zsh"
 _comp_if_needed "uvx" "uvx --generate-shell-completion zsh"
 _comp_if_needed "xh" "xh --generate complete-zsh"
+_comp_if_needed "nerdctl" "nerdctl completion zsh"
 
 
 # Add cache dir to fpath for auto-loading
