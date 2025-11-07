@@ -71,7 +71,6 @@ _comp_if_needed() {
 _COMPLETIONS_UPDATED=0
 
 # Tool completions
-_comp_if_needed "atuin" "atuin gen-completions --shell zsh"
 _comp_if_needed "gh" "gh completion -s zsh"
 _comp_if_needed "kubectl" "kubectl completion zsh"
 _comp_if_needed "helm" "helm completion zsh"
