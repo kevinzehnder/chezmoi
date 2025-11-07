@@ -30,7 +30,6 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:
 zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
 
 # Performance settings
-zstyle ':completion:*' use-cache true
 zstyle ':completion:*' rehash true
 
 # FZF-tab settings
@@ -41,28 +40,37 @@ zstyle ':fzf-tab:*' fzf-flags --bind=tab:accept
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 zstyle ':fzf-tab:*' switch-group '<' '>'
 
-# Auto-generate completions with caching
-ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
-mkdir -p "$ZSH_CACHE_DIR"
+# Custom completions directory setup
+COMPLETIONS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/completions"
+mkdir -p "$COMPLETIONS_DIR"
+
+# Add completions directory to fpath for auto-loading
+fpath=($COMPLETIONS_DIR $fpath)
 
 # Function to conditionally generate completion (only if missing or tool updated)
 _comp_if_needed() {
     local tool=$1
     local gen_cmd=$2
-    local comp_file="$ZSH_CACHE_DIR/_${tool}"
+    local comp_file="$COMPLETIONS_DIR/_${tool}"
     local tool_path=$(command -v $tool 2>/dev/null)
-
+    
+    # Skip if tool is not installed
     if [[ -z "$tool_path" ]]; then
-        return  # Tool not installed, skip
+        return
     fi
-
+    
     # Regenerate if completion missing OR tool binary is newer
     if [[ ! -f "$comp_file" ]] || [[ "$tool_path" -nt "$comp_file" ]]; then
         eval "$gen_cmd" > "$comp_file" 2>/dev/null && echo "Generated completion for $tool"
+        # Flag that we've updated a completion
+        _COMPLETIONS_UPDATED=1
     fi
 }
 
-# Generate completions as needed (cached)
+# Generate completions as needed
+_COMPLETIONS_UPDATED=0
+
+# Tool completions
 _comp_if_needed "atuin" "atuin gen-completions --shell zsh"
 _comp_if_needed "gh" "gh completion -s zsh"
 _comp_if_needed "kubectl" "kubectl completion zsh"
@@ -77,20 +85,42 @@ _comp_if_needed "uvx" "uvx --generate-shell-completion zsh"
 _comp_if_needed "xh" "xh --generate complete-zsh"
 _comp_if_needed "nerdctl" "nerdctl completion zsh"
 
-
-# Add cache dir to fpath for auto-loading
-fpath=($ZSH_CACHE_DIR $fpath)
-
-# Custom completions (for tools without auto-generation or manually maintained)
+# Custom completions loader function
 function load_custom_completions() {
-    local completion_dir="$HOME/.config/zsh/completions"
-    setopt local_options nullglob
-    local compfiles=("$completion_dir"/_*)
-    if [[ -d $completion_dir ]] && [[ -n $compfiles ]]; then
-        for file in "${compfiles[@]}"; do
-            zi ice as"completion" lucid
-            zi snippet "$file"
-        done
+    local completion_dir="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/completions"
+    
+    # Skip if directory doesn't exist
+    if [[ ! -d $completion_dir ]]; then
+        return
     fi
-    unsetopt nullglob
+    
+    # Load completions using zinit if available
+    if (( ${+functions[zi]} )); then
+        setopt local_options nullglob
+        local compfiles=("$completion_dir"/_*)
+        if [[ -n $compfiles ]]; then
+            for file in "${compfiles[@]}"; do
+                zi ice as"completion" lucid
+                zi snippet "$file"
+            done
+        fi
+        unsetopt nullglob
+    # Standard completion loading without zinit
+    else
+        # Make sure the directory is in fpath
+        if [[ ${fpath[(ie)$completion_dir]} -gt ${#fpath} ]]; then
+            fpath=($completion_dir $fpath)
+        fi
+        
+        # Rebuild zcompdump if completions were updated
+        if [[ $_COMPLETIONS_UPDATED -eq 1 ]]; then
+            rm -f "${ZDOTDIR:-$HOME}/.zcompdump"
+            compinit
+        fi
+    fi
 }
+
+# Call the function to load custom completions if any were updated
+if [[ $_COMPLETIONS_UPDATED -eq 1 ]]; then
+    load_custom_completions
+fi
