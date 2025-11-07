@@ -62,6 +62,9 @@ zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
 
 # Performance settings
 zstyle ':completion:*' rehash true
+zmodload -i zsh/complist
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path ~/.cache/zsh
 
 # FZF-tab settings
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
