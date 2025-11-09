@@ -16,6 +16,15 @@ function psk() {
 }
 
 function ports() {
-    check_sudo_nopass || sudo -v
-	sudo procs --sorta tcp --json | gojq '.[] | select(.TCP != "[]")'
+  check_sudo_nopass || sudo -v
+
+  local pids
+  pids=("${(@f)$(sudo procs --sorta tcp --json | gojq '.[] | select(.TCP != "[]") | .PID')}")
+
+  if (( $#pids )); then
+    sudo procs --use-config=large --or "${pids[@]}"
+  else
+    print -u2 "no TCP ports found"
+  fi
 }
+
