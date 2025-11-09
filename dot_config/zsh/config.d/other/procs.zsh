@@ -14,3 +14,8 @@ function psk() {
         --layout=reverse \
         | awk '{print $1}' | xargs -r sudo kill -9
 }
+
+function ports() {
+    check_sudo_nopass || sudo -v
+	sudo procs --sorta tcp --json | gojq '.[] | select(.TCP != "[]")'
+}
