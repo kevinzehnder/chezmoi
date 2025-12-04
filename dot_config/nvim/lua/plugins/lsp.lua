@@ -169,7 +169,10 @@ return {
 
 			gopls = {
 				settings = {
-					gofumpt = true
+					gopls = {
+						gofumpt = true,
+						buildFlags = { "-tags=integration" }
+					}
 				}
 			},
 
