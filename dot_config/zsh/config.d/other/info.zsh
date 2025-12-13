@@ -6,9 +6,9 @@ function info() {
 	local active_services=$(systemctl list-units --type=service --state=active | rg -N "loaded active" | wc -l)
 	local listening=$(ss -tulpn | rg -N LISTEN | wc -l)
 	local cron_count=0
-	for f in /etc/cron.d/* /etc/crontab; do
-		[[ -f "$f" ]] && ((cron_count += $(rg -N -v '^#|^$|^SHELL|^PATH|^MAILTO|^HOME|^LOGNAME|^USER' "$f" | wc -l)))
-	done
+	# for f in /etc/cron.d/* /etc/crontab; do
+	# 	[[ -f "$f" ]] && ((cron_count += $(rg -N -v '^#|^$|^SHELL|^PATH|^MAILTO|^HOME|^LOGNAME|^USER' "$f" | wc -l)))
+	# done
 	for user in $(getent passwd | rg -N -v /nologin$ | cut -d ':' -f 1); do
 		((cron_count += $(sudo crontab -l -u "$user" 2> /dev/null | rg -N -v '^#|^$|^SHELL|^PATH|^MAILTO|^HOME|^LOGNAME|^USER' | wc -l)))
 	done
