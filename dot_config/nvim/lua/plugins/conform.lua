@@ -20,7 +20,8 @@ return {
 		-- Define your formatters
 		formatters_by_ft = {
 			-- lua = { "stylua" },
-			javascript = { "prettierd", "prettier", stop_after_first = true },
+			javscript = { "prettierd", "prettier", stop_after_first = true },
+			json = { "prettier", stop_after_first = true },
 			html = { "prettier", stop_after_first = true },
 			yaml = { "yamlfmt", stop_after_first = true },
 			zsh = { "shfmt" },
