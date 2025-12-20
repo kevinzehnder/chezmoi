@@ -1,3 +1,4 @@
+---
 # .chezmoidata.yaml
 # OS-specific package mappings for chezmoi bootstrap
 # This file centralizes package definitions across different distributions
@@ -35,6 +36,7 @@ packages:
       - duf
       - bat
       - starship
+      - evince
     aur_helper: yay
 
   # Ubuntu/Debian packages
@@ -198,7 +200,7 @@ aur_helpers:
 
 # Starship installation methods by distro
 starship_install:
-  arch: package  # Available via pacman
+  arch: package # Available via pacman
   ubuntu: script # Needs curl install script
   debian: script
   rhel: script
