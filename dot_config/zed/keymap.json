@@ -1,0 +1,98 @@
+// Zed keymap (JSONC)
+// Docs: https://zed.dev/docs/key-bindings
+[
+  // 1) Workspace wide (applies even outside an editor depending on context)
+  {
+    "context": "Workspace",
+    "bindings": {
+      "space e": "workspace::ToggleLeftDock",
+      "space b": "workspace::ToggleRightDock",
+      "ctrl-alt-k": "vim::GoToPreviousTab",
+      "ctrl-alt-j": "vim::GoToTab",
+      // "shift shift": "file_finder::Toggle"
+    },
+  },
+
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "ctrl-l": "workspace::ActivatePaneRight",
+    },
+  },
+
+  // 2) Vim insert mode
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      "j k": "vim::NormalBefore",
+    },
+  },
+
+  // 3) Vim normal mode (main leader bindings)
+  {
+    "context": "vim_mode == normal && !menu",
+    "bindings": {
+      // leader core
+      "space w": "workspace::Save",
+      "space c": "pane::CloseActiveItem",
+      "space x": "zed::Quit",
+
+      // panels
+      "space o": "outline_panel::ToggleFocus",
+      "space d": "diagnostics::Deploy",
+      "space g g": [
+        "task::Spawn",
+        { "task_name": "LazyGit", "reveal_target": "center" },
+      ],
+
+      // search
+      "space /": "pane::DeploySearch",
+
+      // pane focus
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight",
+
+      "shift-u": "vim::Redo",
+      "ctrl-a": "editor::ToggleCodeActions",
+
+      "] f": "vim::NextMethodStart",
+      "[ f": "vim::PreviousMethodStart",
+
+      // "shift-y": ["workspace::SendKeystrokes", "y $"]
+    },
+  },
+
+  // 4) No editor present
+  {
+    "context": "EmptyPane || SharedScreen",
+    "bindings": {
+      // "space f": "file_finder::Toggle"
+    },
+  },
+
+  // 5) Vim control surface
+  {
+    "context": "VimControl",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious",
+    },
+  },
+
+  {
+    "context": "FileFinder || (FileFinder > Picker > Editor) || (FileFinder > Picker > menu)",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious",
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-j": "editor::SelectNext",
+      "ctrl-k": "editor::SelectPrevious",
+    },
+  },
+]
