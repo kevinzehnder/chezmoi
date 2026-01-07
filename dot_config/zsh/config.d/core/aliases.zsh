@@ -61,7 +61,6 @@ alias ca='containers -a'
 alias ap='ansible-playbook'
 alias lg='lazygit'
 alias t='task'
-alias tg='task --taskfile ${HOME}/.Taskfile.yaml --dir ${PWD}'
 alias tf='terraform'
 alias tm='tmux attach -t default || tmux new -s default'
 alias tldrf="tldr --list | fzf --ansi --preview 'script -qec \"tldr {1}\" /dev/null' --height=80% --preview-window=right,60% | xargs tldr"
