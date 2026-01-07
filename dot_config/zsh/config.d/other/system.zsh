@@ -90,31 +90,29 @@ function units() {
 
 	if command -v tspin > /dev/null 2>&1; then
 		local follow_logs='sudo journalctl -n 100 -f -u {1} | tspin'
-		local follow_logs_pre='sudo journalctl -n 50 -f -u {1} | tspin'
 		local logs='sudo journalctl -n 2000 -u {1} | tspin | less -r +G'
 	else
 		local follow_logs='sudo journalctl -n 100 -f -u {1}'
-		local follow_logs_pre='sudo journalctl -n 50 -f -u {1}'
 		local logs='sudo journalctl -n 2000 -e -u {1}'
 		# local logs="sudo journalctl -n 2000 -u {1} --no-pager | bat -l syslog -p --pager='less -R +G'"
 	fi
-	local show_status="sudo -n SYSTEMD_COLORS=1 systemctl status {1} --no-pager"
+	local show_status="sudo SYSTEMD_COLORS=1 systemctl status {1} --no-pager"
 
 	check_sudo_nopass || sudo -v
 	eval "$cmd" \
 		| awk '{print $1}' \
-		| rg '\.service' \
 		| fzf --ansi \
 			--preview "$show_status" \
 			--preview-window=right:60%:wrap:follow \
 			--height=80% \
-			--header $'System Units | CTRL-R: reload\nCTRL-L: journal | CTRL-F: follow logs | CTRL-E: edit\nCTRL-S: start | CTRL-D: stop | CTRL-T: restart' \
-			--bind "ctrl-r:reload($cmd | awk '{print \$1}' | rg '\.service')" \
+			--header $'System Units | CTRL-R: reload\nCTRL-L: journal | CTRL-F: follow logs | CTRL-E: edit\nCTRL-S: start | CTRL-D: stop | CTRL-T: restart\nCTRL-N: enable | CTRL-X: disable' \
+			--bind "ctrl-r:reload($cmd | awk '{print \$1}')" \
 			--bind "ctrl-l:execute($logs)" \
 			--bind "ctrl-f:execute($follow_logs)" \
-			--bind "ctrl-e:execute(sudo systemctl edit {1} --full)" \
-			--bind "ctrl-s:execute(sudo systemctl start {1})" \
-			--bind "ctrl-d:execute(sudo systemctl stop {1})" \
-			--bind "ctrl-t:execute(sudo systemctl restart {1})" \
-			--bind "ctrl-p:preview($follow_logs_pre)"
+			--bind "ctrl-e:execute(sudo systemctl edit {1} --full || read -p 'Press enter...')" \
+			--bind "ctrl-s:execute(sudo systemctl start {1} || read -p 'Failed. Press enter...')" \
+			--bind "ctrl-d:execute(sudo systemctl stop {1} || read -p 'Failed. Press enter...')" \
+			--bind "ctrl-t:execute(sudo systemctl restart {1} || read -p 'Failed. Press enter...')" \
+			--bind "ctrl-n:execute(sudo systemctl enable {1} && echo 'Enabled {1}' || echo 'Failed to enable {1}'; read -p 'Press enter...')" \
+			--bind "ctrl-x:execute(sudo systemctl disable {1} && echo 'Disabled {1}' || echo 'Failed to disable {1}'; read -p 'Press enter...')"
 }
