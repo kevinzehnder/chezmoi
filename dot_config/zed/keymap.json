@@ -5,8 +5,9 @@
   {
     "context": "Workspace",
     "bindings": {
-      "space e": "workspace::ToggleLeftDock",
-      "space b": "workspace::ToggleRightDock",
+      "shift-alt-h": "workspace::ToggleLeftDock",
+      "shift-alt-l": "workspace::ToggleRightDock",
+      "shift-alt-m": "workspace::ToggleBottomDock",
       "ctrl-alt-k": "vim::GoToPreviousTab",
       "ctrl-alt-j": "vim::GoToTab",
       // "shift shift": "file_finder::Toggle"
@@ -80,7 +81,6 @@
       "ctrl-k": "menu::SelectPrevious",
     },
   },
-
   {
     "context": "FileFinder || (FileFinder > Picker > Editor) || (FileFinder > Picker > menu)",
     "bindings": {
@@ -89,10 +89,14 @@
     },
   },
   {
-    "context": "Editor",
+    "context": "Editor && (showing_code_actions || showing_completions)",
     "bindings": {
-      "ctrl-j": "editor::SelectNext",
-      "ctrl-k": "editor::SelectPrevious",
+      "ctrl-k": "editor::ContextMenuPrevious",
+      "up": "editor::ContextMenuPrevious",
+      "ctrl-j": "editor::ContextMenuNext",
+      "down": "editor::ContextMenuNext",
+      "pageup": "editor::ContextMenuFirst",
+      "pagedown": "editor::ContextMenuLast",
     },
   },
 ]
