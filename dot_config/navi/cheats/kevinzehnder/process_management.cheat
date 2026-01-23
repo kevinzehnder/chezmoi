@@ -1,8 +1,5 @@
 % processes, monitoring, system, ports, zsh, kz
 
-# Show Processes With Open Ports (Interactive)
-procsp
-
 # List All Processes In Large Detailed View
 procsl
 
@@ -11,12 +8,6 @@ psk
 
 # Show Processes With Active Network Connections
 ports
-
-# View And Kill Top CPU-Consuming Processes
-cpuhogs
-
-# View And Kill Top Memory-Consuming Processes
-memhogs
 
 % procs, kz
 # Show Open Ports With FZF

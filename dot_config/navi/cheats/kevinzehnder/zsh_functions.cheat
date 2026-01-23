@@ -1,5 +1,5 @@
 
-% kz, zsh, system, services, monitoring, admin
+% kz, zsh, system, services, monitoring, admin, pacman, yay, aur, packages
 # Find And Edit Files With FZF+bat Preview
 fe
 
@@ -35,3 +35,15 @@ tldrf
 
 # Build tcpdump filter thru FZF
 netsniff
+
+# Pacman: Search and Install Packages (FZF)
+pkinstall <query>
+
+# Pacman: List Installed Packages and Remove (FZF)
+pklist
+
+# Yay: List AUR Packages and Remove (FZF)
+yaylist
+
+# Yay: Search AUR+Repos and Install Packages (FZF)
+yayinstall <query>
