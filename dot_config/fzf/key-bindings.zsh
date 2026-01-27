@@ -58,8 +58,8 @@ function __betterfsel() {
 	local toggle_file="/tmp/fe_hidden_toggle_$$"
 	trap "rm -f $toggle_file" EXIT
 	local item
-	fd --type f --color=always | fzf -m --ansi \
-		--bind "ctrl-h:execute-silent([ -f $toggle_file ] && rm $toggle_file || touch $toggle_file)+reload:fd --type f --color=always \$([ -f $toggle_file ] && echo '--hidden') {q}" \
+	fd --type f --color=always --no-ignore | fzf -m --ansi \
+		--bind "ctrl-h:execute-silent([ -f $toggle_file ] && rm $toggle_file || touch $toggle_file)+reload:fd --type f --color=always --no-ignore \$([ -f $toggle_file ] && echo '--hidden') {q}" \
 		--preview 'bat --style=numbers --color=always {}' \
 		--header "CTRL-H: toggle hidden files | ENTER: select file(s)" | while read item; do
 		echo -n "${(q)item} "
