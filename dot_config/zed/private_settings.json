@@ -7,10 +7,30 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "experimental.theme_overrides": {
+    "editor.document_highlight.read_background": "#00000000",
+    "editor.document_highlight.write_background": "#00000000",
+    "editor.document_highlight.bracket_background": "#00000000",
+  },
+  "languages": {
+    "Python": {
+      "indent_guides": {
+        "background_coloring": "indent_aware",
+      },
+    },
+  },
+  "current_line_highlight": "all",
+  "selection_highlight": false,
+  "rounded_selection": true,
+  "git": {
+    "inline_blame": {
+      "enabled": false,
+    },
+  },
   "icon_theme": {
     "mode": "system",
     "light": "Zed (Default)",
-    "dark": "Zed (Default)"
+    "dark": "Zed (Default)",
   },
   "git_panel": {
     "dock": "right",
