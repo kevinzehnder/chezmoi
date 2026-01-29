@@ -1,0 +1,53 @@
+
+% linux, arch, pacman, yay, kz
+# Update
+sudo pacman -Syu
+
+# Yay Update
+yay
+
+# Delete Pacman Cache
+sudo pacman -Scc
+
+# Delete Yay Cache
+yay -Scc
+
+# Delete unwanted dependencies
+yay -Yc
+
+# Check Orphan packages
+pacman -Qtdq
+
+# Remove Orphan packages
+sudo pacman -Rns $(pacman -Qtdq)
+
+# Update AUR Packages Only
+yay -Sua
+
+# Update Including -git Packages
+yay -Syu --devel
+
+# Fix Arch Keyring
+sudo pacman -S archlinux-keyring
+
+# Sync File Database (for pacman -F)
+sudo pacman -Fy
+
+# Find Which Package Owns a File
+pacman -F <file>
+
+# List Files Installed by Package
+pacman -Ql <package>
+
+# List Explicitly Installed Packages
+pacman -Qe
+
+# List Foreign/AUR Packages
+pacman -Qm
+
+# Keep Only Last 3 Versions in Cache
+paccache -r
+
+# Remove All Cached Uninstalled Packages
+paccache -ruk0
+

@@ -1,0 +1,10 @@
+
+
+% restic, kz
+# List Snapshots, Grouped by Tags
+restic snapshots --group-by "tags"
+
+
+
+
+
