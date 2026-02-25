@@ -176,23 +176,6 @@ return {
 				}
 			},
 
-			pyright = {
-				settings = {
-					pyright = {
-						disableOrganizeImports = true, -- Using Ruff
-					},
-					python = {
-						analysis = {
-							diagnosticSeverityOverrides = {
-								reportUndefinedVariable = "none",
-								reportUnusedVariable = "none",
-							},
-							typeCheckingMode = "standard",
-						},
-					},
-				},
-			},
-
 			["helm-ls"] = {
 				logLevel = "info",
 				valuesFiles = {
