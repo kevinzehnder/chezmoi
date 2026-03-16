@@ -32,6 +32,7 @@ alias svim='sudo -E nvim' # Use -E to preserve environment variables
 alias vim='nvim'
 alias cim='nvim'
 alias v='nvim' # Shorter alias for nvim
+alias z='zeditor'
 # 
 # Neovide (WSL-aware)
 if [[ -n "$WSL_DISTRO_NAME" ]]; then

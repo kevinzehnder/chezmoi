@@ -10,7 +10,7 @@
       "shift-alt-m": "workspace::ToggleBottomDock",
       "ctrl-alt-k": "vim::GoToPreviousTab",
       "ctrl-alt-j": "vim::GoToTab",
-      // "shift shift": "file_finder::Toggle"
+      // "shift shift": "file_finder::Toggle",
     },
   },
 
