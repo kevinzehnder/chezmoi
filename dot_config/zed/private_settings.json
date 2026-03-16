@@ -7,6 +7,41 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "agent_servers": {},
+  "context_servers": {
+    "serena": {
+      "enabled": true,
+      "remote": false,
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--enable-web-dashboard",
+        "false",
+      ],
+    },
+    "mcp-server-context7": {
+      "enabled": true,
+      "remote": false,
+      "settings": {
+        "context7_api_key": "${CONTEXT7_API_KEY}",
+      },
+    },
+  },
+  "language_models": {
+    "open_router": {
+      "api_url": "https://openrouter.ai/api/v1",
+      "available_models": [
+        {
+          "name": "arcee-ai/trinity-large-preview:free",
+          "display_name": "arcee-ai/trinity-large-preview:free",
+          "max_tokens": 163800,
+        },
+      ],
+    },
+  },
   "experimental.theme_overrides": {
     "editor.document_highlight.read_background": "#00000000",
     "editor.document_highlight.write_background": "#00000000",
@@ -45,39 +80,8 @@
   "agent_buffer_font_size": 18.0,
   "buffer_line_height": "standard",
   "ui_font_family": "IosevkaTerm Nerd Font",
-  "context_servers": {
-    "sequential-thinking": {
-      "enabled": true,
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
-    },
-    "serena": {
-      "enabled": true,
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/oraios/serena",
-        "serena",
-        "start-mcp-server",
-        "--enable-web-dashboard",
-        "false",
-      ],
-    },
-    "gopls": {
-      "enabled": true,
-      "command": "gopls",
-      "args": ["mcp"],
-      "env": {},
-    },
-    "mcp-server-context7": {
-      "enabled": true,
-      "env": {
-        "CONTEXT7_API_KEY": "$CONTEXT7_API_KEY"
-      },
-    },
-  },
   "git_panel": {
-    "dock": "right",
+    "dock": "left",
   },
   "vim_mode": true,
   "terminal": {
@@ -87,24 +91,48 @@
     "max_scroll_history_lines": 100000,
   },
   "project_panel": {
-    "hide_hidden": false,
+    "hide_hidden": true,
     "auto_fold_dirs": false,
   },
   "base_keymap": "VSCode",
   "agent": {
+    "default_profile": "ask",
+    "tool_permissions": {
+      "tools": {
+        "mcp:serena:replace_content": {
+          "default": "allow",
+        },
+        "mcp:mcp-server-sequential-thinking:sequentialthinking": {
+          "default": "allow",
+        },
+        "mcp:serena:activate_project": {
+          "default": "allow",
+        },
+        "mcp:serena:list_dir": {
+          "default": "allow",
+        },
+        "mcp:serena:initial_instructions": {
+          "default": "allow",
+        },
+        "mcp:serena:check_onboarding_performed": {
+          "default": "allow",
+        },
+        "mcp:gopls:go_diagnostics": {
+          "default": "allow",
+        },
+      },
+    },
+    "default_model": {
+      "enable_thinking": true,
+      "provider": "openrouter",
+      "model": "qwen/qwen3.5-397b-a17b",
+    },
     "favorite_models": [
       {
         "provider": "deepseek",
         "model": "deepseek-chat",
       },
     ],
-    "always_allow_tool_actions": true,
-    "default_model": {
-      "provider": "deepseek",
-      "model": "deepseek-chat",
-    },
-    "enabled": true,
-    "button": true,
     "model_parameters": [],
   },
   "relative_line_numbers": "enabled",
