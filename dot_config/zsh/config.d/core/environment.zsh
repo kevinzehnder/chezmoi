@@ -3,8 +3,8 @@
 #
 
 # Editors
-export EDITOR='nvim'
-export VISUAL='nvim'
+export EDITOR='zeditor --wait'
+export VISUAL='zeditor --wait'
 export COLORTERM="truecolor"
 export NVIM_APPNAME="nvim"
 
