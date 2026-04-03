@@ -23,13 +23,13 @@ function fs() {
 	rm -f "$hidden_state_file"
 	local file=$(echo "$match" | cut -d':' -f1)
 	if [[ -n $file ]]; then
-		${EDITOR:-vim} "$file" "+$(echo "$match" | cut -d':' -f2)"
+		${(z)EDITOR:-vim} "$file" "+$(echo "$match" | cut -d':' -f2)"
 	fi
 }
 
 # Find files and edit them
 function fe() {
-	local toggle_file="/tmp/fe_hidden_toggle_$"
+	local toggle_file="/tmp/fe_hidden_toggle_$$"
 	trap "rm -f $toggle_file" EXIT
 
 	local files=($(fzf -m --ansi \
@@ -39,5 +39,5 @@ function fe() {
 		< <(fd --type f --color=always)))
 
 	rm -f "$toggle_file"
-	[[ ${#files[@]} -gt 0 ]] && ${EDITOR:-vim} "${files[@]}"
+	[[ ${#files[@]} -gt 0 ]] && ${(z)EDITOR:-vim} "${files[@]}"
 }
