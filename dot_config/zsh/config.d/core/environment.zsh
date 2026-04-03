@@ -60,3 +60,13 @@ export FZF_COMMON_OPTIONS="
 
 # Navi settings
 export NAVI_FZF_OVERRIDES='--with-nth 3,2,1 --height 70%'
+
+# pnpm
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+# Bun
+export PATH="$HOME/.bun/bin:$PATH"
