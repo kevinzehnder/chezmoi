@@ -28,16 +28,26 @@ function fs() {
 }
 
 # Find files and edit them
+# Works both as a ZLE widget (ctrl-f) and as a normal shell function
 function fe() {
-	local toggle_file="/tmp/fe_hidden_toggle_$$"
-	trap "rm -f $toggle_file" EXIT
+	emulate -L zsh
+	# Tell ZLE we're about to do terminal I/O
+	[[ -n $WIDGET ]] && zle -I
 
-	local files=($(fzf -m --ansi \
+	local toggle_file="/tmp/fe_hidden_toggle_$$"
+
+	local files
+	files=($(fd --type f --color=always | fzf -m --ansi \
 		--bind "ctrl-h:execute-silent([ -f $toggle_file ] && rm $toggle_file || touch $toggle_file)+reload:fd --type f --color=always \$([ -f $toggle_file ] && echo '--hidden') {q}" \
 		--preview 'bat --style=numbers --color=always {}' \
-		--header "CTRL-H: toggle hidden files | ENTER: open in $EDITOR" \
-		< <(fd --type f --color=always)))
+		--header "CTRL-H: toggle hidden files | ENTER: open in $EDITOR"))
 
 	rm -f "$toggle_file"
-	[[ ${#files[@]} -gt 0 ]] && ${(z)EDITOR:-vim} "${files[@]}"
+
+	if [[ ${#files[@]} -gt 0 ]]; then
+		${(z)EDITOR:-vim} "${files[@]}"
+	fi
+
+	# Reset prompt if running as a ZLE widget
+	[[ -n $WIDGET ]] && zle reset-prompt
 }
