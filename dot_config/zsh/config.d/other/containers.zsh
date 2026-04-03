@@ -51,6 +51,19 @@ alias c='containers'
 alias ca='containers -a'
 
 function images() {
+	# Determine container runtime
+	local runtime
+	if [[ -n "$CONTAINER_RUNTIME" ]]; then
+		runtime="$CONTAINER_RUNTIME"
+	elif command -v docker &> /dev/null; then
+		runtime="docker"
+	elif command -v nerdctl &> /dev/null; then
+		runtime="nerdctl"
+	else
+		echo "No container runtime found (docker or nerdctl). Set CONTAINER_RUNTIME to override." >&2
+		return 1
+	fi
+
 	check_sudo_nopass || sudo -v
 
 	local header=$(sudo ${runtime} images | head -1)

@@ -52,7 +52,7 @@ alias d='sudo docker'
 alias dcomp='sudo docker compose'
 alias n='sudo nerdctl'
 alias ncomp='sudo nerdctl compose'
-alias dockerkill='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
+alias dockerkill='sudo docker stop $(sudo docker ps -a -q) && sudo docker rm $(sudo docker ps -a -q)'
 alias ld='lazydocker'
 
 alias c='containers'
@@ -83,8 +83,12 @@ alias kgd='kubectl get deployments'
 alias zj='zellij'
 
 # Documentation and help
-alias -g -- -h='-h 2>&1 | bat --language=help --style=plain -P'
-alias -g -- --help='--help 2>&1 | bat --language=help --style=plain -P'
+# Note: Global aliases for -h/--help were removed because they intercept
+# these flags in ALL commands (including scripts/arguments), causing breakage.
+# Use the 'help' wrapper function instead:
+function help() {
+	"$@" --help 2>&1 | bat --language=help --style=plain -P
+}
 alias batp='bat -Pp'
 
 # Navi settings

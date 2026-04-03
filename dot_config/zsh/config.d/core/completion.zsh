@@ -56,7 +56,7 @@ function load_custom_completions() {
     fi
     
     # Load completions using zinit if available
-    if (( ${+functions[zi]} )); then
+    if (( ${+functions[zinit]} || ${+functions[zi]} )); then
         setopt local_options nullglob
         local compfiles=("$completion_dir"/_*)
         if [[ -n $compfiles ]]; then

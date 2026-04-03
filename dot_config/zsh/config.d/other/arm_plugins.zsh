@@ -16,8 +16,7 @@ if [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
 		bpick"*aarch64*" bensadeh/tailspin \
 		mv"choose* -> choose" bpick"choose-aarch64-unknown-linux-gnu" theryangeary/choose \
 		bpick"*aarch64*" mv"ripgrep* -> rg" pick"rg/rg" BurntSushi/ripgrep \
-		bpick"*linux_arm64*" junegunn/fzf \
-		mv"bat* -> bat" pick"bat/bat" @sharkdp/bat
+		bpick"*linux_arm64*" junegunn/fzf
 
 # ARM 32-bit specific tools
 elif [[ "$ARCH" == "armv7l" ]]; then
@@ -31,6 +30,9 @@ elif [[ "$ARCH" == "armv7l" ]]; then
 		bpick"*armv7-unknown-linux-musleabi*" mv"ripgrep* -> rg" pick"rg/rg" BurntSushi/ripgrep \
 		bpick"*linux_armv7*" junegunn/fzf \
 		pick"btop/bin/btop" bpick"*armv7*" aristocratos/btop
+fi
 
-	unalias vim
+# Remove vim->nvim alias if nvim is not available
+if ! command -v nvim &> /dev/null; then
+	unalias vim 2>/dev/null
 fi

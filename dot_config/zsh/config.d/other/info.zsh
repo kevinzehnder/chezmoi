@@ -4,7 +4,7 @@ function info() {
     local os_pretty=$(grep "PRETTY_NAME" /etc/os-release | cut -d'=' -f2 | tr -d '"')
     
     # 2. Enhanced Reboot Check Logic
-    needs_reboot() {
+    _info_needs_reboot() {
         # Check for Arch Linux orphaned kernel
         if [[ "$os_id" == "arch" ]]; then
             local running_kernel=$(uname -r)
@@ -75,7 +75,7 @@ function info() {
     done
 
     echo -e "\n🔄 Reboot Status:"
-    if needs_reboot; then
+    if _info_needs_reboot; then
         echo -e "    ⚠️  \033[31;1mReboot Required\033[0m (Kernel mismatch/Orphaned modules)"
     else
         echo "    ✅ System up to date"

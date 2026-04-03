@@ -14,7 +14,7 @@ bindkey '^[[F' end-of-line       # End
 # History navigation
 bindkey "^K" up-line-or-history                  # Ctrl+K
 bindkey "^J" down-line-or-history                # Ctrl+J
-bindkey '^R' history-incremental-search-backward # Ctrl+R
+# Note: Ctrl+R is handled by Atuin (see atuin_init.zsh)
 bindkey '^[[A' up-line-or-search                 # Up arrow
 bindkey '^[[B' down-line-or-search               # Down arrow
 

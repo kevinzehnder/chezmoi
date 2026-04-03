@@ -50,20 +50,9 @@ function parse_ssh_config() {
 		| sed 's/^Host //' \
 		| tr ' ' '\n' \
 		| tr -d '\r' \
-		|
-		# Remove any CR characters
-		sort -u \
-		| while read -r host; do
-			# Clean any remaining whitespace
-			host=$(echo "$host" | xargs)
-			[[ -z "$host" ]] && continue
-
-			# For each host, use ssh -G to get the full expanded config
-			local details=$(ssh -G "$host" 2> /dev/null)
-			if [[ $? -eq 0 ]]; then
-				echo "$host"
-			fi
-		done
+		| sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
+		| grep -v '^$' \
+		| sort -u
 
 	rm "$temp_file"
 }

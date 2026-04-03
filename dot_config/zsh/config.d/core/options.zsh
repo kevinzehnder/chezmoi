@@ -17,7 +17,7 @@ setopt append_history         # Allow multiple sessions to append to one Zsh com
 setopt extended_history       # Show timestamp in history.
 setopt hist_reduce_blanks     # Remove superfluous blanks from history items.
 setopt hist_verify            # Do not execute immediately upon history expansion.
-setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
+# Note: inc_append_history is implied by share_history, no need to set both.
 
 # Directory navigation
 setopt auto_cd           # Use cd by typing directory name if it's not a command.

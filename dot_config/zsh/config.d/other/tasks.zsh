@@ -11,7 +11,7 @@ function tg() {
 	if [ -n "$selected_tasks" ]; then
 		# Loop through the selected tasks and execute the command with each task as an argument
 		for task in $selected_tasks; do
-			task "$@"--taskfile ${HOME}/.Taskfile.yaml $task
+			task "$@" --taskfile ${HOME}/.Taskfile.yaml $task
 		done
 	fi
 }
