@@ -11,4 +11,5 @@ keybind = alt+ctrl+s=write_screen_file:open
 
 keybind = alt+i=increase_font_size:2
 keybind = alt+d=decrease_font_size:2
-keybind = shift+enter=text:\x1b\r
+
+keybind = alt+backspace=text:\x1b\x7f
