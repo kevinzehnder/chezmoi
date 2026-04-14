@@ -114,6 +114,9 @@ return {
 		local capabilities = vim.lsp.protocol.make_client_capabilities()
 		capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
+
+		local lspconfig_util = require("lspconfig.util")
+		local home_dir = lspconfig_util.path.sanitize(vim.uv.os_homedir())
 		-- Enable the following language servers
 		--  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
 		--
@@ -189,6 +192,14 @@ return {
 				-- cmd = {...},
 				-- filetypes = { ...},
 				-- capabilities = {},
+				root_dir = function (fname)
+					local root = lspconfig_util.root_pattern(".luarc.json", ".luarc.jsonc", ".git")(fname)
+					if root and lspconfig_util.path.sanitize(root) ~= home_dir then
+						return root
+					end
+
+					return lspconfig_util.path.dirname(fname)
+				end,
 				settings = {
 					Lua = {
 						completion = {
