@@ -11,6 +11,9 @@ format = "[$symbol $cluster](blue)"
 detect_files = [".k8s"]
 detect_env_vars = ['INVALID']
 
+[gcloud]
+disabled = true
+
 [battery]
 full_symbol = "🔋"
 charging_symbol = "🔌"
