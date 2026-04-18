@@ -7,11 +7,19 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "agent_servers": {},
+  "agent_servers": {
+    "pi-acp": {
+      "type": "registry"
+    },
+    "gemini": {
+      "type": "registry"
+    },
+    "codex-acp": {
+      "type": "registry"
+    }
+  },
   "context_servers": {
     "serena": {
-      "enabled": true,
-      "remote": false,
       "command": "uvx",
       "args": [
         "--from",
@@ -19,146 +27,144 @@
         "serena",
         "start-mcp-server",
         "--enable-web-dashboard",
-        "false",
-      ],
+        "false"
+      ]
     },
     "mcp-server-context7": {
-      "enabled": true,
-      "remote": false,
       "settings": {
-        "context7_api_key": "${CONTEXT7_API_KEY}",
-      },
-    },
+        "context7_api_key": "${CONTEXT7_API_KEY}"
+      }
+    }
   },
   "language_models": {
-    "open_router": {
+    "openrouter": {
       "api_url": "https://openrouter.ai/api/v1",
       "available_models": [
         {
           "name": "arcee-ai/trinity-large-preview:free",
           "display_name": "arcee-ai/trinity-large-preview:free",
-          "max_tokens": 163800,
-        },
-      ],
-    },
+          "max_tokens": 163800
+        }
+      ]
+    }
   },
   "experimental.theme_overrides": {
     "editor.document_highlight.read_background": "#00000000",
     "editor.document_highlight.write_background": "#00000000",
-    "editor.document_highlight.bracket_background": "#00000000",
+    "editor.document_highlight.bracket_background": "#00000000"
   },
   "languages": {
     "Python": {
       "indent_guides": {
-        "background_coloring": "indent_aware",
-      },
-    },
+        "background_coloring": "indent_aware"
+      }
+    }
   },
   "current_line_highlight": "all",
   "rounded_selection": true,
   "icon_theme": {
     "mode": "system",
-    "light": "Colored Zed Icons Theme Light",
-    "dark": "Colored Zed Icons Theme Dark",
+    "light": "Material Icon Theme",
+    "dark": "Colored Zed Icons Theme Dark"
   },
   "lsp": {
     "gopls": {
       "initialization_options": {
-        "buildFlags": ["-tags=integration"],
-      },
-    },
+        "buildFlags": ["-tags=integration"]
+      }
+    }
   },
   "title_bar": {
-    "show_sign_in": false,
+    "show_sign_in": false
   },
   "git": {
     "inline_blame": {
-      "enabled": false,
-    },
+      "enabled": false
+    }
   },
   "selection_highlight": false,
   "agent_buffer_font_size": 18.0,
   "buffer_line_height": "standard",
   "ui_font_family": "IosevkaTerm Nerd Font",
   "git_panel": {
-    "dock": "left",
+    "dock": "left"
   },
   "vim_mode": true,
   "terminal": {
     "font_size": 16.0,
     "font_family": "IosevkaTerm Nerd Font",
     "blinking": "on",
-    "max_scroll_history_lines": 100000,
+    "max_scroll_history_lines": 100000
   },
   "project_panel": {
-    "hide_hidden": true,
-    "auto_fold_dirs": false,
+    "hide_hidden": false,
+    "auto_fold_dirs": false
   },
   "base_keymap": "VSCode",
   "agent": {
-    "default_profile": "ask",
+    "default_profile": "write",
     "tool_permissions": {
       "tools": {
-        "mcp:serena:replace_content": {
-          "default": "allow",
+        "mcp:serena:read_file": {
+          "default": "allow"
         },
-        "mcp:mcp-server-sequential-thinking:sequentialthinking": {
-          "default": "allow",
+        "mcp:serena:execute_shell_command": {
+          "default": "allow"
+        },
+        "mcp:serena:replace_content": {
+          "default": "allow"
         },
         "mcp:serena:activate_project": {
-          "default": "allow",
+          "default": "allow"
         },
         "mcp:serena:list_dir": {
-          "default": "allow",
+          "default": "allow"
         },
         "mcp:serena:initial_instructions": {
-          "default": "allow",
+          "default": "allow"
         },
         "mcp:serena:check_onboarding_performed": {
-          "default": "allow",
-        },
-        "mcp:gopls:go_diagnostics": {
-          "default": "allow",
-        },
-      },
+          "default": "allow"
+        }
+      }
     },
     "default_model": {
       "enable_thinking": true,
       "provider": "openrouter",
-      "model": "qwen/qwen3.5-397b-a17b",
+      "model": "openrouter/free"
     },
     "favorite_models": [
       {
         "provider": "deepseek",
-        "model": "deepseek-chat",
-      },
+        "model": "deepseek-chat"
+      }
     ],
-    "model_parameters": [],
+    "model_parameters": []
   },
   "relative_line_numbers": "enabled",
   "sticky_scroll": {
-    "enabled": true,
+    "enabled": true
   },
   "vertical_scroll_margin": 15.0,
   "gutter": {
-    "line_numbers": true,
+    "line_numbers": true
   },
   "minimap": {
     "display_in": "all_editors",
     "show": "auto",
-    "thumb": "always",
+    "thumb": "always"
   },
   "buffer_font_family": "IosevkaTerm Nerd Font",
   "file_types": {
     "terraform-vars": ["*.tfvars"],
     "go-template": ["*.tmpl"],
-    "properties": ["*.migration"],
+    "properties": ["*.migration"]
   },
   "colorize_brackets": true,
   "show_whitespaces": "trailing",
   "show_edit_predictions": true,
   "indent_guides": {
-    "enabled": true,
+    "enabled": true
   },
   "wrap_guides": [100],
   "ui_font_size": 18.0,
@@ -166,12 +172,12 @@
   "theme": {
     "mode": "system",
     "light": "Solarized Light",
-    "dark": "Tokyo Night Storm",
+    "dark": "Tokyo Night Storm"
   },
   "diagnostics": {
     "inline": {
       "enabled": true,
-      "max_severity": null,
-    },
-  },
+      "max_severity": null
+    }
+  }
 }
