@@ -1,0 +1,18 @@
+[metadata]
+name = "kzh-ssh"
+description = "SSH host picker using ~/.ssh/config and ~/.ssh/config.d"
+requirements = ["grep", "sed", "tr", "sort", "ssh"]
+
+[source]
+command = "( [[ -f \"$HOME/.ssh/config\" ]] && cat \"$HOME/.ssh/config\"; [[ -d \"$HOME/.ssh/config.d\" ]] && cat \"$HOME/.ssh/config.d\"/* 2>/dev/null ) | grep -i '^Host ' | grep -v '[*?!]' | sed 's/^Host //' | tr ' ' '\\n' | sed '/^$/d' | sort -u"
+
+[preview]
+command = "zsh -ic 'source ~/.config/zsh/config.d/other/ssh_connection_preview.zsh && ssh_connection_preview \"{}\"'"
+
+[keybindings]
+enter = "actions:connect"
+
+[actions.connect]
+description = "Connect to selected host"
+command = "ssh '{}'"
+mode = "execute"

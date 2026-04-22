@@ -1,0 +1,13 @@
+[metadata]
+name = "kzh-taskfile"
+description = "Pick tasks from ~/.Taskfile.yaml"
+requirements = ["task", "awk", "sort", "sed"]
+
+[source]
+command = "task --taskfile $HOME/.Taskfile.yaml --list 2>/dev/null | awk 'NR>1 {print $2}' | sed 's/:$//' | sort -u"
+
+[preview]
+command = "task --taskfile $HOME/.Taskfile.yaml --summary '{}' 2>/dev/null"
+
+[ui.preview_panel]
+size = 60

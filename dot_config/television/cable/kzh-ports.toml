@@ -1,0 +1,48 @@
+[metadata]
+name = "kzh-ports"
+description = "Listening TCP/UDP ports with owning process"
+requirements = ["ss", "python3", "ps"]
+
+[source]
+command = [
+  "~/.config/television/scripts/kzh_ports_source.py --public --tcp-only",
+  "~/.config/television/scripts/kzh_ports_source.py --public",
+  "~/.config/television/scripts/kzh_ports_source.py",
+  "~/.config/television/scripts/kzh_ports_source.py --with-process-only",
+]
+# order above:
+# 1) public TCP listeners only (default)
+# 2) public TCP+UDP listeners
+# 3) all listeners (incl. localhost)
+# 4) listeners with known app+pid only
+# cycle with Ctrl-S
+no_sort = true
+display = "{split:\t:6}\t{split:\t:0}/{split:\t:1}\t{split:\t:4}\tpid={split:\t:5}\t{split:\t:2}"
+output = "{split:\t:2}"
+
+[preview]
+command = "~/.config/television/scripts/kzh_ports_preview.sh '{}'"
+
+[ui.preview_panel]
+size = 60
+
+[keybindings]
+shortcut = "f6"
+ctrl-e = "actions:inspect"
+f2 = "actions:terminate"
+f3 = "actions:kill"
+
+[actions.inspect]
+description = "Inspect selected port with ss"
+command = "bash -lc 'p=\"{split:\\t:6}\"; [ \"$p\" = \"-\" ] && exit 0; if sudo -n true 2>/dev/null; then sudo ss -lntuap | grep -E \"[:.]$p([[:space:]]|$)\" | less -R; else ss -lntuap | grep -E \"[:.]$p([[:space:]]|$)\" | less -R; fi'"
+mode = "fork"
+
+[actions.terminate]
+description = "Send SIGTERM to owning process"
+command = "bash -lc 'pid=\"{split:\\t:5}\"; [ \"$pid\" = \"-\" ] && exit 0; if sudo -n true 2>/dev/null; then sudo kill -15 \"$pid\"; else kill -15 \"$pid\"; fi'"
+mode = "fork"
+
+[actions.kill]
+description = "Send SIGKILL to owning process"
+command = "bash -lc 'pid=\"{split:\\t:5}\"; [ \"$pid\" = \"-\" ] && exit 0; if sudo -n true 2>/dev/null; then sudo kill -9 \"$pid\"; else kill -9 \"$pid\"; fi'"
+mode = "fork"

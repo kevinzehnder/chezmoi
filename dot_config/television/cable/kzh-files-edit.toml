@@ -1,0 +1,20 @@
+[metadata]
+name = "kzh-files-edit"
+description = "Multi-select files and open in $EDITOR"
+requirements = ["fd", "bat"]
+
+[source]
+command = ["fd -t f", "fd -t f -H"]
+
+[preview]
+command = "bat -n --color=always '{}'"
+env = { BAT_THEME = "ansi" }
+
+[keybindings]
+enter = "actions:edit"
+
+[actions.edit]
+description = "Open selected files in editor"
+command = "${EDITOR:-vim} {}"
+shell = "bash"
+mode = "execute"
