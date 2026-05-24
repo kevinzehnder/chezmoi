@@ -3,8 +3,7 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		lazy = false,
 		build = ":TSUpdate",
-		config = function()
-			local treesitter = require("nvim-treesitter")
+		config = function ()
 			local languages = {
 				"bash",
 				"c",
@@ -20,16 +19,12 @@ return {
 				"vimdoc",
 			}
 
-			treesitter.setup({
-				install_dir = vim.fn.stdpath("data") .. "/site",
-			})
-
-			treesitter.install(languages)
-
-			vim.api.nvim_create_autocmd("FileType", {
-				callback = function(args)
-					pcall(vim.treesitter.start, args.buf)
-				end,
+			require("nvim-treesitter.configs").setup({
+				ensure_installed = languages,
+				auto_install = true,
+				highlight = { enable = true },
+				indent = { enable = true },
+				parser_install_dir = vim.fn.stdpath("data") .. "/site",
 			})
 		end,
 	},
