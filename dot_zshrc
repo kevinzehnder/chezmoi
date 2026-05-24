@@ -27,10 +27,15 @@ if [ -d "$HOME/.config/zsh/config.d/other/" ]; then
 	unset conf
 fi
 
-# Load Atuin last
-zinit ice as"command" from"gh-r" bpick"atuin-*.tar.gz" mv"atuin*/atuin -> atuin"
-zinit light atuinsh/atuin
-source "$HOME/.config/zsh/config.d/core/atuin_init.zsh"
+# Load Atuin last (non-fatal on unsupported distros/arches)
+if command -v zinit > /dev/null 2>&1; then
+	zinit ice as"command" from"gh-r" bpick"atuin-*.tar.gz" mv"atuin*/atuin -> atuin"
+	zinit light atuinsh/atuin || true
+fi
+
+if command -v atuin > /dev/null 2>&1; then
+	source "$HOME/.config/zsh/config.d/core/atuin_init.zsh"
+fi
 
 # direnv
 if command -v direnv > /dev/null 2>&1; then
