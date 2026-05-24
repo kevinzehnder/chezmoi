@@ -436,7 +436,7 @@
     },
     "hooks": {
         "colorGeneration": "",
-        "darkModeChange": "/home/kevinzehnder/.local/bin/noctalia-sync-gtk-theme.sh",
+        "darkModeChange": "/usr/bin/env bash -lc '$HOME/.local/bin/noctalia-sync-gtk-theme.sh'",
         "enabled": true,
         "performanceModeDisabled": "",
         "performanceModeEnabled": "",
