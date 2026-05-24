@@ -37,6 +37,16 @@ packages:
       - bat
       - starship
       - evince
+      - niri
+      - swaylock
+      - cliphist
+      - wlr-randr
+      - xdg-desktop-portal
+      - xdg-desktop-portal-gnome
+      - argyllcms
+      - colord
+    aur:
+      - noctalia-shell
     aur_helper: yay
 
   # Ubuntu/Debian packages

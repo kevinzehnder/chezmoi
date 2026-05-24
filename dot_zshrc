@@ -45,3 +45,11 @@ fi
 if command -v zoxide > /dev/null 2>&1; then
 	eval "$(zoxide init zsh --cmd j)"
 fi
+
+# pnpm
+export PNPM_HOME="/home/kevinzehnder/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end

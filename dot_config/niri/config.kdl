@@ -268,12 +268,15 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// Start Noctalia shell (Quickshell) instead of Waybar/Mako.
-spawn-sh-at-startup "command -v qs >/dev/null && qs -c noctalia-shell"
+// Start Noctalia shell (Quickshell) at startup.
+spawn-at-startup "qs" "-c" "noctalia-shell"
 
-// Keep clipboard history helpers.
-spawn-sh-at-startup "command -v wl-paste >/dev/null && pgrep -f 'wl-paste --type text --watch cliphist store' >/dev/null || wl-paste --type text --watch cliphist store"
-spawn-sh-at-startup "command -v wl-paste >/dev/null && pgrep -f 'wl-paste --type image --watch cliphist store' >/dev/null || wl-paste --type image --watch cliphist store"
+// Apply display ICC/VCGT LUT profile.
+spawn-sh-at-startup "ICC_PROFILE_PATH='/var/lib/colord/icc/HDR WQHD #1 2021-03-16 21-29 2.2 F-S XYZLUT+MTX.icm' ICC_DISPLAY_INDEX='1' ~/.config/niri/scripts/load-icc.sh"
+
+// Keep clipboard history helpers (when cliphist is installed).
+spawn-sh-at-startup "if command -v wl-paste >/dev/null && command -v cliphist >/dev/null && ! pgrep -f 'wl-paste --type text --watch cliphist store' >/dev/null; then wl-paste --type text --watch cliphist store; fi"
+spawn-sh-at-startup "if command -v wl-paste >/dev/null && command -v cliphist >/dev/null && ! pgrep -f 'wl-paste --type image --watch cliphist store' >/dev/null; then wl-paste --type image --watch cliphist store; fi"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"

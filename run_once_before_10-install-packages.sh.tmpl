@@ -188,10 +188,46 @@ install_aur_helper() {
     echo -e "${GREEN}✓ $aur_helper installed successfully${NC}"
 }
 
+install_arch_aur_packages() {
+    local real_user="$1"
+    local aur_helper="{{ .packages.arch.aur_helper }}"
+
+    local aur_packages=(
+        {{- range .packages.arch.aur }}
+        "{{ . }}"
+        {{- end }}
+    )
+
+    if [ ${#aur_packages[@]} -eq 0 ]; then
+        echo -e "${GREEN}✓ No AUR packages configured${NC}"
+        return 0
+    fi
+
+    if ! command -v "$aur_helper" &> /dev/null; then
+        echo -e "${YELLOW}AUR helper ($aur_helper) not found, skipping AUR package installation${NC}"
+        return 0
+    fi
+
+    echo -e "${YELLOW}Installing AUR packages: ${aur_packages[*]}${NC}"
+
+    if [ "$EUID" -eq 0 ]; then
+        if [ -z "$real_user" ] || [ "$real_user" == "root" ]; then
+            echo -e "${YELLOW}Cannot install AUR packages as root without a real user context. Skipping.${NC}"
+            return 1
+        fi
+        sudo -u "$real_user" "$aur_helper" -S --needed --noconfirm "${aur_packages[@]}"
+    else
+        "$aur_helper" -S --needed --noconfirm "${aur_packages[@]}"
+    fi
+
+    echo -e "${GREEN}✓ AUR packages installed successfully${NC}"
+}
+
 bootstrap_arch() {
     local user="$1"
     install_arch_packages
     install_aur_helper "$user"
+    install_arch_aur_packages "$user"
     set_default_shell "$user"
 }
 

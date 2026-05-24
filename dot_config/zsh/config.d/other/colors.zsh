@@ -16,6 +16,7 @@ function colorschemeswitcher() {
 		fi
 		change_zellij_theme "solarized-light"
 		change_k9s_theme "solarized_light"
+		change_tv_theme "solarized-light"
 	elif [ "$1" = "gruvbox" ]; then
 		rm -f ~/.lightmode
 
@@ -27,6 +28,7 @@ function colorschemeswitcher() {
 			export LS_COLORS="$(vivid generate gruvbox-dark)"
 		fi
 		change_zellij_theme "gruvbox"
+		change_tv_theme "gruvbox-dark"
 	else
 		rm -f ~/.lightmode
 
@@ -40,6 +42,7 @@ function colorschemeswitcher() {
 		fi
 		change_zellij_theme "tokyo-night-dark"
 		change_k9s_theme "nord"
+		change_tv_theme "tokyonight"
 	fi
 }
 
@@ -61,6 +64,22 @@ function change_zellij_theme() {
 		# Use sed to replace the theme line
 		sed -i.bak "s/^theme \".*\"$/theme \"$NEW_THEME\"/" "$CONFIG_FILE"
 	fi
+}
+
+function change_tv_theme() {
+	if [ "$#" -ne 1 ]; then
+		echo "Usage: change_tv_theme <new-theme>" >&2
+		return 1
+	fi
+
+	local config_file="$HOME/.config/television/config.toml"
+	local new_theme="$1"
+
+	[[ -f "$config_file" ]] || return 0
+	command -v sed >/dev/null 2>&1 || return 0
+
+	# Replace first theme assignment in config.toml
+	sed -i.bak "0,/^theme = .*/s//theme = \"$new_theme\"/" "$config_file"
 }
 
 function change_k9s_theme() {

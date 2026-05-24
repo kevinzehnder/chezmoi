@@ -6,19 +6,10 @@
     "context": "Workspace",
     "bindings": {
       "ctrl-alt-m": "terminal_panel::Toggle",
-      "ctrl-alt-b": "pane::ActivatePreviousItem",
-      "ctrl-alt-n": "pane::ActivateNextItem",
-      "ctrl-alt-j": "workspace::ActivatePaneDown",
-      "ctrl-alt-k": "workspace::ActivatePaneUp",
+      "ctrl-alt-k": "pane::ActivatePreviousItem",
+      "ctrl-alt-j": "pane::ActivateNextItem",
       "ctrl-p": "file_finder::Toggle",
       "ctrl-f": "pane::DeploySearch",
-    },
-  },
-
-  {
-    "context": "ProjectPanel",
-    "bindings": {
-      "ctrl-l": "workspace::ActivatePaneRight",
     },
   },
 
@@ -37,7 +28,7 @@
       // leader core
       "space w": "workspace::Save",
       "space c": "pane::CloseActiveItem",
-      "space x": "zed::Quit",
+      // "space x": "zed::Quit",
 
       // panels
       "space o": "outline_panel::ToggleFocus",
@@ -51,9 +42,6 @@
       "space /": "pane::DeploySearch",
 
       // buffer/item switch
-      "[ b": "pane::ActivatePreviousItem",
-      "] b": "pane::ActivateNextItem",
-
       // pane focus
       "ctrl-h": "workspace::ActivatePaneLeft",
       "ctrl-l": "workspace::ActivatePaneRight",
@@ -63,9 +51,6 @@
       "alt-j": "editor::GoToDiagnostic",
       "alt-k": "editor::GoToPreviousDiagnostic",
       "alt-m": "diagnostics::Deploy",
-
-      "] f": "vim::NextMethodStart",
-      "[ f": "vim::PreviousMethodStart",
 
       // "shift-y": ["workspace::SendKeystrokes", "y $"]
     },
@@ -114,6 +99,35 @@
       "ctrl-j": ["terminal::SendKeystroke", "ctrl-j"],
       "ctrl-k": ["terminal::SendKeystroke", "ctrl-k"],
       "ctrl-l": ["terminal::SendKeystroke", "ctrl-l"],
+    },
+  },
+  {
+    "context": "SettingsWindow",
+    "unbind": {
+      "ctrl-w": "workspace::CloseWindow",
+    },
+  },
+  {
+    "context": "RulesLibrary",
+    "unbind": {
+      "ctrl-w": "workspace::CloseWindow",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-w": "workspace::CloseActiveDock",
+    },
+  },
+  {
+    "context": "Pane",
+    "unbind": {
+      "ctrl-w": [
+        "pane::CloseActiveItem",
+        {
+          "close_pinned": false,
+        },
+      ],
     },
   },
 ]
