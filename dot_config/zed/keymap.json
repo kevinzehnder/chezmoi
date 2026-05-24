@@ -5,14 +5,13 @@
   {
     "context": "Workspace",
     "bindings": {
-      "shift-alt-h": "workspace::ToggleLeftDock",
-      "shift-alt-l": "workspace::ToggleRightDock",
-      "shift-alt-m": "workspace::ToggleBottomDock",
+      "ctrl-alt-m": "terminal_panel::Toggle",
+      "ctrl-alt-b": "pane::ActivatePreviousItem",
+      "ctrl-alt-n": "pane::ActivateNextItem",
+      "ctrl-alt-j": "workspace::ActivatePaneDown",
+      "ctrl-alt-k": "workspace::ActivatePaneUp",
       "ctrl-p": "file_finder::Toggle",
       "ctrl-f": "pane::DeploySearch",
-      "ctrl-alt-k": "vim::GoToPreviousTab",
-      "ctrl-alt-j": "vim::GoToTab",
-      // "shift shift": "file_finder::Toggle",
     },
   },
 
@@ -51,10 +50,12 @@
       // search
       "space /": "pane::DeploySearch",
 
+      // buffer/item switch
+      "[ b": "pane::ActivatePreviousItem",
+      "] b": "pane::ActivateNextItem",
+
       // pane focus
       "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-j": "workspace::ActivatePaneDown",
-      "ctrl-k": "workspace::ActivatePaneUp",
       "ctrl-l": "workspace::ActivatePaneRight",
 
       "shift-u": "vim::Redo",
@@ -102,6 +103,17 @@
       "down": "editor::ContextMenuNext",
       "pageup": "editor::ContextMenuFirst",
       "pagedown": "editor::ContextMenuLast",
+    },
+  },
+
+  // 6) Terminal: keep shell shortcuts intact
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-r": ["terminal::SendKeystroke", "ctrl-r"],
+      "ctrl-j": ["terminal::SendKeystroke", "ctrl-j"],
+      "ctrl-k": ["terminal::SendKeystroke", "ctrl-k"],
+      "ctrl-l": ["terminal::SendKeystroke", "ctrl-l"],
     },
   },
 ]
