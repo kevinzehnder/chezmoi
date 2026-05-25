@@ -441,7 +441,7 @@
         "performanceModeDisabled": "",
         "performanceModeEnabled": "",
         "screenLock": "",
-        "screenUnlock": "",
+        "screenUnlock": "/usr/bin/env bash -lc '$HOME/.local/bin/apply-icc-vcgt-wayland.sh'", 
         "session": "",
         "startup": "",
         "wallpaperChange": ""
