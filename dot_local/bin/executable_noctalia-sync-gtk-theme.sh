@@ -55,7 +55,7 @@ layout {
     }
 
     tab-indicator {
-        active-color   "#7aa2f7"
+        active-color   "#bb9af7"
         inactive-color "#9aa5ce"
         urgent-color   "#f7768e"
     }
@@ -100,7 +100,7 @@ layout {
     }
 
     tab-indicator {
-        active-color   "#c2b8a3"
+        active-color   "#6c71c4"
         inactive-color "#c1d9ea"
         urgent-color   "#dc322f"
     }
