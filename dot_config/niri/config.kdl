@@ -376,7 +376,7 @@ binds {
     Mod+Return hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+D hotkey-overlay-title="Open Noctalia Launcher" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
-    Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
+    Ctrl+Alt+L hotkey-overlay-title="Lock the Screen: Noctalia" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "sessionMenu" "lock"; }
     Mod+Shift+C hotkey-overlay-title="Restart Noctalia shell" { spawn-sh "qs kill -c noctalia-shell; qs -c noctalia-shell"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
