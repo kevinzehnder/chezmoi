@@ -268,11 +268,22 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// Start Noctalia shell (Quickshell) at startup.
-spawn-at-startup "qs" "-c" "noctalia-shell"
+// Start Noctalia shell via systemd user service (noctalia-shell.service).
 
-// Apply display ICC/VCGT LUT profile.
-spawn-sh-at-startup "ICC_PROFILE_PATH='/var/lib/colord/icc/HDR WQHD #1 2021-03-16 21-29 2.2 F-S XYZLUT+MTX.icm' ICC_DISPLAY_INDEX='1' ~/.config/niri/scripts/load-icc.sh"
+// Re-apply Noctalia/GTK/Niri colors on login after shell init.
+spawn-sh-at-startup "sleep 2; ~/.local/bin/noctalia-sync-gtk-theme.sh"
+
+// Apply display ICC/VCGT LUT profile on Wayland.
+spawn-sh-at-startup "sleep 3; ~/.local/bin/apply-icc-vcgt-wayland.sh"
+
+// Bitwarden desktop (SSH agent depends on it).
+spawn-at-startup "/opt/Bitwarden/bitwarden-app"
+
+// Polkit authentication agent (needed for mount/auth prompts outside full DEs).
+spawn-sh-at-startup "if ! pgrep -f '/usr/lib/polkit-kde-authentication-agent-1' >/dev/null; then /usr/lib/polkit-kde-authentication-agent-1; fi"
+
+// Optional automounter for removable devices in WM sessions (install: pacman -S udiskie).
+spawn-sh-at-startup "if command -v udiskie >/dev/null && ! pgrep -x udiskie >/dev/null; then udiskie -t; fi"
 
 // Keep clipboard history helpers (when cliphist is installed).
 spawn-sh-at-startup "if command -v wl-paste >/dev/null && command -v cliphist >/dev/null && ! pgrep -f 'wl-paste --type text --watch cliphist store' >/dev/null; then wl-paste --type text --watch cliphist store; fi"
@@ -336,6 +347,13 @@ window-rule {
     // - host Firefox (app-id is "firefox")
     // - Flatpak Firefox (app-id is "org.mozilla.firefox")
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+// Open Xpad sticky notes as floating by default.
+window-rule {
+    match app-id="xpad"
+    match app-id=r#"^org\.gnome\.Xpad$"#
     open-floating true
 }
 

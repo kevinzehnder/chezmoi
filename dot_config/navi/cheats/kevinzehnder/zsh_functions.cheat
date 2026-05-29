@@ -6,20 +6,41 @@ fe
 # Search File Contents and Edit Matches (Ripgrep+Fzf)
 fs
 
-# journalctl -f thru tailspin
+# journalctl -f thru tailspin (sudo/system)
 jf
 
-# journalctl thru tailspin
+# journalctl thru tailspin (no sudo by default; supports --user)
 jctl
 
-# Browse and Manage Systemd Services
+# journalctl via sudo helper
+sjctl
+
+# Browse and Manage systemd units (system mode, no sudo)
+# default view: service/socket/timer/target/path
 units
 
-# Browse and Manage Systemd Services (Only Enabled Ones)
+# Browse and Manage user units (niri/noctalia)
+units --user
+
+# Show all systemd unit types (includes mount/device/swap/etc.)
+units --all-types
+
+# Browse enabled unit files
 units -e
 
-# Browse and Manage Systemd Services (Only Active Ones)
+# Browse active runtime units
 units -a
+
+# Filter by explicit unit type(s)
+units --type service
+units --type timer
+units --type mount
+
+# Browse and manage system units with sudo
+sunits
+
+# Show options/help
+units --help
 
 # Browse and Manage Systemd Timers
 timers
