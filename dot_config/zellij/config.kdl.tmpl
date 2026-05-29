@@ -249,7 +249,7 @@ simplified_ui true
 // Choose the theme that is specified in the themes section.
 // Default: default
 // 
-theme "solarized-light"
+theme "{{ if eq .theme.mode "light" }}solarized-light{{ else if eq .theme.mode "gruvbox" }}gruvbox{{ else }}tokyo-night-dark{{ end }}"
  
 // Choose the base input mode of zellij.
 // Default: normal

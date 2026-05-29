@@ -13,7 +13,7 @@ k9s:
     reactive: false
     noIcons: false
     defaultsToFullScreen: false
-    skin: solarized_light
+    skin: {{ if eq .theme.mode "light" }}solarized_light{{ else if eq .theme.mode "gruvbox" }}nord{{ else }}nord{{ end }}
     # skin: nord
   skipLatestRevCheck: false
   disablePodCounting: false

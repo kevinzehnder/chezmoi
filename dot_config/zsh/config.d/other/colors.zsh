@@ -3,101 +3,63 @@ alias light='colorschemeswitcher solarized'
 alias dark='colorschemeswitcher dark'
 alias gruv='colorschemeswitcher gruvbox'
 
+function set_chezmoi_theme_mode() {
+	local mode="$1"
+	local data_file="$HOME/.local/share/chezmoi/.chezmoidata.yaml"
+
+	[[ -f "$data_file" ]] || return 0
+	command -v perl >/dev/null 2>&1 || return 0
+
+	# Update only `theme.mode` in chezmoi data (single source of truth for rendered theme configs).
+	perl -0777 -i -pe 's/(theme:\n(?:\s*#.*\n)?\s*mode:\s*")[^"]+("\s*)/${1}'"$mode"'${2}/s' "$data_file"
+}
+
+function apply_theme_templates() {
+	command -v chezmoi >/dev/null 2>&1 || return 0
+
+	chezmoi apply --exclude=scripts \
+		"$HOME/.config/zellij/config.kdl" \
+		"$HOME/.config/btop/btop.conf" \
+		"$HOME/.config/k9s/config.yaml" \
+		"$HOME/.config/television/config.toml" \
+		>/dev/null 2>&1 || true
+}
+
 function colorschemeswitcher() {
-	if [ "$1" = "solarized" ]; then
+	local scheme="${1:-dark}"
+	local no_apply="${2:-}"
+
+	if [ "$scheme" = "solarized" ]; then
 		touch ~/.lightmode
 
 		export BASE16_THEME="solarized-light"
-		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
-
 		export BAT_THEME="gruvbox-light"
 		if command -v vivid >/dev/null 2>&1; then
 			export LS_COLORS="$(vivid generate solarized-light)"
 		fi
-		change_zellij_theme "solarized-light"
-		change_k9s_theme "solarized_light"
-		change_tv_theme "solarized-light"
-	elif [ "$1" = "gruvbox" ]; then
+		set_chezmoi_theme_mode "light"
+	elif [ "$scheme" = "gruvbox" ]; then
 		rm -f ~/.lightmode
 
 		export BASE16_THEME="gruvbox-dark"
-		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
-
 		export BAT_THEME="gruvbox-dark"
 		if command -v vivid >/dev/null 2>&1; then
 			export LS_COLORS="$(vivid generate gruvbox-dark)"
 		fi
-		change_zellij_theme "gruvbox"
-		change_tv_theme "gruvbox-dark"
+		set_chezmoi_theme_mode "gruvbox"
 	else
 		rm -f ~/.lightmode
 
-		# fzf
 		export BASE16_THEME="tokyo-night-storm"
-		# [ -f "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config" ] && source "$ZINIT[PLUGINS_DIR]/tinted-theming---tinted-fzf/bash/base16-$BASE16_THEME.config"
-
 		export BAT_THEME="ansi"
 		if command -v vivid >/dev/null 2>&1; then
 			export LS_COLORS="$(vivid generate tokyonight-storm)"
 		fi
-		change_zellij_theme "tokyo-night-dark"
-		change_k9s_theme "nord"
-		change_tv_theme "tokyonight"
-	fi
-}
-
-function change_zellij_theme() {
-	if [ "$#" -ne 1 ]; then
-		echo "Usage: change_zellij_theme <new-theme>" >&2
-		return 1
+		set_chezmoi_theme_mode "dark"
 	fi
 
-	CONFIG_FILE="$HOME/.config/zellij/config.kdl"
-	NEW_THEME="$1"
-
-	if [ ! -f "$CONFIG_FILE" ]; then
-		# Silently skip if config doesn't exist
-		return 0
-	fi
-
-	if command -v sed >/dev/null 2>&1; then
-		# Use sed to replace the theme line
-		sed -i.bak "s/^theme \".*\"$/theme \"$NEW_THEME\"/" "$CONFIG_FILE"
-	fi
-}
-
-function change_tv_theme() {
-	if [ "$#" -ne 1 ]; then
-		echo "Usage: change_tv_theme <new-theme>" >&2
-		return 1
-	fi
-
-	local config_file="$HOME/.config/television/config.toml"
-	local new_theme="$1"
-
-	[[ -f "$config_file" ]] || return 0
-	command -v sed >/dev/null 2>&1 || return 0
-
-	# Replace first theme assignment in config.toml
-	sed -i.bak "0,/^theme = .*/s//theme = \"$new_theme\"/" "$config_file"
-}
-
-function change_k9s_theme() {
-	if [ "$#" -ne 1 ]; then
-		echo "Usage: change_k9s_theme <new-theme>" >&2
-		return 1
-	fi
-	CONFIG_FILE="$HOME/.config/k9s/config.yaml"
-	NEW_THEME="$1"
-
-	if [ ! -f "$CONFIG_FILE" ]; then
-		# Silently skip if config doesn't exist
-		return 0
-	fi
-
-	if command -v sed >/dev/null 2>&1; then
-		# Use sed to replace the skin line, considering the nested structure
-		sed -i.bak 's/^ *skin: .*$/    skin: '"$NEW_THEME"'/' "$CONFIG_FILE"
+	if [[ "$no_apply" != "--no-apply" ]]; then
+		apply_theme_templates
 	fi
 }
 
@@ -105,16 +67,16 @@ function darkmodechecker() {
 	if command -v gsettings >/dev/null 2>&1; then
 		theme=$(gsettings get org.gnome.desktop.interface gtk-theme 2>/dev/null)
 		if [[ "$theme" == *Dark* ]]; then
-			dark
+			colorschemeswitcher dark --no-apply
 		else
-			light
+			colorschemeswitcher solarized --no-apply
 		fi
 	else
 		# Fallback to file-based detection if gsettings is unavailable
 		if [[ -f ~/.lightmode ]]; then
-			light
+			colorschemeswitcher solarized --no-apply
 		else
-			dark
+			colorschemeswitcher dark --no-apply
 		fi
 	fi
 }
@@ -124,8 +86,8 @@ if [[ -z "$SSH_CONNECTION" ]]; then
 	darkmodechecker
 else
 	if [[ -f ~/.lightmode ]]; then
-		light
+		colorschemeswitcher solarized --no-apply
 	else
-		dark
+		colorschemeswitcher dark --no-apply
 	fi
 fi
