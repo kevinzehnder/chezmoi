@@ -69,6 +69,10 @@ vim.keymap.set("n", "<C-up>", ":resize +2<CR>", { desc = "Resize Window" })
 vim.keymap.set("n", "<C-right>", ":vertical resize -2<CR>", { desc = "Resize Window" })
 vim.keymap.set("n", "<C-left>", ":vertical resize +2<CR>", { desc = "Resize Window" })
 
+-- remap H and L
+vim.keymap.set("n", "H", "^", { desc = "Line Start" })
+vim.keymap.set("n", "L", "$", { desc = "Line End" })
+
 -- harpoon
 vim.keymap.set("n", "<leader>hh", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", { desc = "Menu" })
 vim.keymap.set("n", "<leader>ha", "<cmd>lua require('harpoon.mark').add_file()<cr>", { desc = "Add File" })
