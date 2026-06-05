@@ -9,7 +9,7 @@ versions:
 
 theme:
   # light | dark | gruvbox
-  mode: "light"
+  mode: "dark"
 
 # Common packages across all distributions
 packages:
