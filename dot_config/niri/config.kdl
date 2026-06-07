@@ -268,7 +268,8 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// Start Noctalia shell via systemd user service (noctalia-shell.service).
+// Start Noctalia shell at login.
+spawn-sh-at-startup "qs -c noctalia-shell"
 
 // Re-apply Noctalia/GTK/Niri colors on login after shell init.
 spawn-sh-at-startup "sleep 2; ~/.local/bin/noctalia-sync-gtk-theme.sh"
