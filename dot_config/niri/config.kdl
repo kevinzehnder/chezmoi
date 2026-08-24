@@ -269,29 +269,13 @@ layout {
 // See the binds section below for more spawn examples.
 
 // Start Noctalia shell at login.
-spawn-sh-at-startup "qs -c noctalia-shell"
-
-// Re-apply Noctalia/GTK/Niri colors on login after shell init.
-spawn-sh-at-startup "sleep 2; ~/.local/bin/noctalia-sync-gtk-theme.sh"
-
-// Apply display ICC/VCGT LUT profile on Wayland.
-spawn-sh-at-startup "sleep 3; ~/.local/bin/apply-icc-vcgt-wayland.sh"
+spawn-at-startup "noctalia"
 
 // Bitwarden desktop (SSH agent depends on it).
 spawn-at-startup "/opt/Bitwarden/bitwarden-app"
 
-// Polkit authentication agent (needed for mount/auth prompts outside full DEs).
-spawn-sh-at-startup "if ! pgrep -f '/usr/lib/polkit-kde-authentication-agent-1' >/dev/null; then /usr/lib/polkit-kde-authentication-agent-1; fi"
-
 // Optional automounter for removable devices in WM sessions (install: pacman -S udiskie).
 spawn-sh-at-startup "if command -v udiskie >/dev/null && ! pgrep -x udiskie >/dev/null; then udiskie -t; fi"
-
-// Keep clipboard history helpers (when cliphist is installed).
-spawn-sh-at-startup "if command -v wl-paste >/dev/null && command -v cliphist >/dev/null && ! pgrep -f 'wl-paste --type text --watch cliphist store' >/dev/null; then wl-paste --type text --watch cliphist store; fi"
-spawn-sh-at-startup "if command -v wl-paste >/dev/null && command -v cliphist >/dev/null && ! pgrep -f 'wl-paste --type image --watch cliphist store' >/dev/null; then wl-paste --type image --watch cliphist store; fi"
-
-// To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
-// spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
 
 hotkey-overlay {
     // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
@@ -376,6 +360,19 @@ window-rule {
     clip-to-geometry true
 }
 
+// Noctalia settings works best as a centered floating window.
+window-rule {
+    match app-id="dev.noctalia.Noctalia"
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
+}
+
+debug {
+    // Allow Noctalia notification actions to activate their source windows.
+    honor-xdg-activation-with-invalid-serial
+}
+
 binds {
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
     // in the end. To find an XKB name for a particular key, you may use a program
@@ -394,36 +391,28 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
     Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
-    Mod+D hotkey-overlay-title="Open Noctalia Launcher" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
-    Ctrl+Alt+L hotkey-overlay-title="Lock the Screen: Noctalia" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "sessionMenu" "lock"; }
-    Mod+Shift+C hotkey-overlay-title="Restart Noctalia shell" { spawn-sh "qs kill -c noctalia-shell; qs -c noctalia-shell"; }
+    Mod+D hotkey-overlay-title="Open Noctalia Launcher" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
+    Ctrl+Alt+L hotkey-overlay-title="Lock the Screen: Noctalia" { spawn "noctalia" "msg" "session" "lock"; }
+    Mod+Shift+C hotkey-overlay-title="Restart Noctalia" { spawn-sh "pkill -x noctalia; exec noctalia"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.
     // For example, this is a standard bind to toggle the screen reader (orca).
     Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill orca || exec orca"; }
 
-    // Example volume keys mappings for PipeWire & WirePlumber.
-    // The allow-when-locked=true property makes them work even when the session is locked.
-    // Using spawn-sh allows to pass multiple arguments together with the command.
-    // "-l 1.0" limits the volume to 100%.
-    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; }
-    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
+    // Route hardware keys through Noctalia for native OSD feedback.
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "noctalia" "msg" "volume-up" "10"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "noctalia" "msg" "volume-down" "10"; }
+    XF86AudioMute        allow-when-locked=true { spawn "noctalia" "msg" "volume-mute"; }
     XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
 
-    // Example media keys mapping using playerctl.
-    // This will work with any MPRIS-enabled media player.
-    XF86AudioPlay        allow-when-locked=true { spawn-sh "playerctl play-pause"; }
-    XF86AudioStop        allow-when-locked=true { spawn-sh "playerctl stop"; }
-    XF86AudioPrev        allow-when-locked=true { spawn-sh "playerctl previous"; }
-    XF86AudioNext        allow-when-locked=true { spawn-sh "playerctl next"; }
+    XF86AudioPlay allow-when-locked=true { spawn "noctalia" "msg" "media" "toggle"; }
+    XF86AudioStop allow-when-locked=true { spawn "noctalia" "msg" "media" "stop"; }
+    XF86AudioPrev allow-when-locked=true { spawn "noctalia" "msg" "media" "previous"; }
+    XF86AudioNext allow-when-locked=true { spawn "noctalia" "msg" "media" "next"; }
 
-    // Example brightness key mappings for brightnessctl.
-    // You can use regular spawn with multiple arguments too (to avoid going through "sh"),
-    // but you need to manually put each argument in separate "" quotes.
-    XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "noctalia" "msg" "brightness-up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "noctalia" "msg" "brightness-down"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,
@@ -663,6 +652,3 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 }
-
-include "./noctalia.kdl"
-

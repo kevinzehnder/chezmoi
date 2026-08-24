@@ -1,0 +1,68 @@
+# ICC VCGT and Noctalia Night Light share gamma control; keep Night Light disabled.
+[hooks]
+started = [
+  "$HOME/.local/bin/apply-icc-vcgt-wayland.sh",
+  "$HOME/.local/bin/noctalia-sync-gtk-theme.sh",
+]
+theme_mode_changed = "$HOME/.local/bin/noctalia-sync-gtk-theme.sh \"$NOCTALIA_THEME_MODE\""
+
+[theme]
+mode = "auto"
+source = "custom"
+custom_palette = "Solarized"
+
+[location]
+custom_schedule = true
+sunrise = "06:30"
+sunset = "18:30"
+
+[shell]
+font_family = "Sans Serif"
+polkit_agent = true
+clipboard_enabled = true
+
+[shell.panel]
+transparency_mode = "soft"
+borders = false
+shadow = true
+launcher_placement = "attached"
+clipboard_placement = "attached"
+control_center_placement = "attached"
+wallpaper_placement = "attached"
+session_placement = "attached"
+
+[notification]
+enable_daemon = true
+show_actions = true
+
+[bar.main]
+position = "bottom"
+thickness = 40
+background_opacity = 0.93
+radius = 12
+margin_ends = 4
+margin_edge = 4
+padding = 10
+widget_spacing = 6
+shadow = true
+auto_hide = false
+reserve_space = true
+capsule = true
+capsule_fill = "surface_variant"
+capsule_radius = 8.0
+capsule_opacity = 0.85
+start = ["launcher", "media"]
+center = ["workspaces"]
+end = ["tray", "notifications", "battery", "volume", "theme-toggle", "control-center", "clock", "session"]
+
+[widget.theme-toggle]
+type = "custom_button"
+glyph = "moon"
+tooltip = "Theme: click to toggle; right-click for automatic"
+
+[widget.theme-toggle.actions]
+left = "theme-mode-toggle"
+right = "theme-mode-set auto"
+middle = "settings-open-widget theme"
+scroll_up = "none"
+scroll_down = "none"

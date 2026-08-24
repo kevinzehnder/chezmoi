@@ -9,7 +9,7 @@ versions:
 
 theme:
   # light | dark | gruvbox
-  mode: "dark"
+  mode: "light"
 
 # Common packages across all distributions
 packages:
@@ -42,15 +42,13 @@ packages:
       - starship
       - evince
       - niri
-      - swaylock
-      - cliphist
-      - wlr-randr
+      - wl-clipboard
       - xdg-desktop-portal
       - xdg-desktop-portal-gnome
       - argyllcms
       - colord
-    aur:
-      - noctalia-shell
+      - noctalia
+    aur: []
     aur_helper: yay
 
   # Ubuntu/Debian packages
