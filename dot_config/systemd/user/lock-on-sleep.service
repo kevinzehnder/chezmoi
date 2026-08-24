@@ -1,0 +1,12 @@
+[Unit]
+Description=Lock session before sleep and restore ICC after unlock
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/lock-on-sleep.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target
