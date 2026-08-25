@@ -7,16 +7,18 @@ dbus-monitor --system \
   "type='signal',interface='org.freedesktop.DBus.Properties',member='PropertiesChanged',arg0='org.freedesktop.login1.Session'" \
   2>/dev/null | \
 awk '
+  function emit(action) { print action; fflush() }
   /^signal / { event = ""; locked_hint = 0 }
   /member=PrepareForSleep/ { event = "sleep" }
   /member=PropertiesChanged/ { event = "session" }
   /string "LockedHint"/ { if (event == "session") locked_hint = 1 }
-  /boolean true/ { if (event == "sleep") print "lock" }
-  /boolean false/ { if (event == "session" && locked_hint) print "restore-icc" }
+  /boolean true/ { if (event == "sleep") emit("lock") }
+  /boolean false/ { if (event == "session" && locked_hint) emit("restore-icc") }
 ' | while IFS= read -r action; do
   case "$action" in
     lock) loginctl lock-session ;;
     restore-icc)
+      echo "[lock-on-sleep] restoring ICC after unlock"
       sleep 1 # Let the compositor recreate the gamma-control surface.
       "$HOME/.local/bin/apply-icc-vcgt-wayland.sh"
       ;;
