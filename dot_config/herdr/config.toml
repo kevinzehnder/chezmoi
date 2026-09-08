@@ -1,0 +1,17 @@
+onboarding = false
+
+[ui.toast]
+delivery = "system"
+
+[theme]
+name = "solarized-light"
+auto_switch = true
+light_name = "solarized-light"
+dark_name = "tokyo-night"
+
+# Direct agent navigation.  These remain inside Herdr: kitty does not map
+# Alt+J/K, and Niri's window-navigation modifier is Super in this session.
+# Keep Ctrl+Alt+J/K free for Kitty's outer-tab navigation.
+[keys]
+previous_agent = "alt+k"
+next_agent = "alt+j"
