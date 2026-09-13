@@ -72,7 +72,7 @@ return {
 				--
 				-- When you move your cursor, the highlights will be cleared (the second autocommand).
 				local client = vim.lsp.get_client_by_id(event.data.client_id)
-				if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+				if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
 					local highlight_augroup = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
 					vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
 						buffer = event.buf,
@@ -99,7 +99,7 @@ return {
 				-- code, if the language server you are using supports them
 				--
 				-- This may be unwanted, since they displace some of your code
-				if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+				if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
 					map("<leader>lh", function ()
 						vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
 					end, "toggle Inlay [h]ints")
@@ -276,23 +276,42 @@ return {
 			}
 		})
 
-		require("lspconfig").pyright.setup({
-			init_options = {
-				settings = {
-					pyright = {
-						disableOrganizeImports = true, -- Using Ruff
-					},
-					python = {
-						analysis = {
-							diagnosticSeverityOverrides = {
-								reportUndefinedVariable = "none",
-								reportUnusedVariable = "none",
-							},
-							typeCheckingMode = "standard",
-						},
-					},
-				}
+		-- Use the project's locked ty version when available.
+		local lspconfig = require("lspconfig")
+		local configs = require("lspconfig.configs")
+		if not configs.ty then
+			configs.ty = {
+				default_config = {
+					cmd = { "uv", "run", "ty", "server" },
+					filetypes = { "python" },
+					root_dir = lspconfig_util.root_pattern("pyproject.toml", "ty.toml", ".git"),
+					single_file_support = true,
+				},
 			}
+		end
+		lspconfig.ty.setup({ capabilities = capabilities })
+
+		local docc = vim.fn.exepath("docc")
+		if docc == "" then
+			docc = vim.fn.expand("~/.go/bin/docc")
+		end
+
+		vim.api.nvim_create_autocmd("FileType", {
+			group = vim.api.nvim_create_augroup("docc-lsp", { clear = true }),
+			pattern = "markdown",
+			callback = function(args)
+				local root = vim.fs.root(args.file, { ".docc" })
+				if not root or vim.fn.executable(docc) ~= 1 then
+					return
+				end
+
+				vim.lsp.start({
+					name = "docc",
+					cmd = { docc, "lsp" },
+					root_dir = root,
+					capabilities = capabilities,
+				})
+			end,
 		})
 	end,
 }

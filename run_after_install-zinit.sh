@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Install Zinit only during an explicit chezmoi apply, pinned to a reviewed commit.
+set -euo pipefail
+
+readonly ZINIT_REPO="https://github.com/zdharma-continuum/zinit.git"
+readonly ZINIT_REV="f38e079f67c5a98d9ecf0e40f7971c7dc2c87003"
+readonly ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
+
+if ! command -v git >/dev/null 2>&1; then
+    echo "Zinit bootstrap: git is required" >&2
+    exit 1
+fi
+
+if [[ -d "$ZINIT_HOME/.git" ]] && [[ "$(git -C "$ZINIT_HOME" rev-parse HEAD 2>/dev/null || true)" == "$ZINIT_REV" ]]; then
+    echo "Zinit already installed at pinned revision ${ZINIT_REV:0:12}"
+    exit 0
+fi
+
+if [[ -e "$ZINIT_HOME" && ! -d "$ZINIT_HOME/.git" ]]; then
+    echo "Zinit bootstrap: refusing to replace non-repository path: $ZINIT_HOME" >&2
+    exit 1
+fi
+
+mkdir -p "$(dirname "$ZINIT_HOME")"
+if [[ ! -d "$ZINIT_HOME/.git" ]]; then
+    git clone "$ZINIT_REPO" "$ZINIT_HOME"
+else
+    git -C "$ZINIT_HOME" remote set-url origin "$ZINIT_REPO"
+    git -C "$ZINIT_HOME" fetch --tags origin
+fi
+
+git -C "$ZINIT_HOME" checkout --detach "$ZINIT_REV"
+[[ "$(git -C "$ZINIT_HOME" rev-parse HEAD)" == "$ZINIT_REV" ]]
+echo "Zinit installed at pinned revision ${ZINIT_REV:0:12}"

@@ -3,6 +3,9 @@
 // Check the wiki for a full description of the configuration:
 // https://niri-wm.github.io/niri/Configuration:-Introduction
 
+// Permanent workspace for messengers.
+workspace "chat"
+
 // Input device configuration.
 // Find the full list of options on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Input
@@ -268,8 +271,10 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// Start Noctalia shell at login.
+// Start Noctalia shell and nirius follow-mode daemon at login.
 spawn-at-startup "noctalia"
+spawn-at-startup "/home/kevinzehnder/.cargo/bin/niriusd"
+
 
 // Bitwarden desktop (SSH agent depends on it).
 spawn-at-startup "/opt/Bitwarden/bitwarden-app"
@@ -342,6 +347,14 @@ window-rule {
     open-floating true
 }
 
+// Open video players floating by default.
+window-rule {
+    match app-id=r#"^(io\.github\.celluloid_player\.Celluloid|mpv)$"#
+    open-floating true
+    default-column-width { proportion 0.8; }
+    default-window-height { proportion 0.8; }
+}
+
 // Example: block out two password managers from screen capture.
 // (This example rule is commented out with a "/-" in front.)
 /-window-rule {
@@ -352,6 +365,12 @@ window-rule {
 
     // Use this instead if you want them visible on third-party screenshot tools.
     // block-out-from "screencast"
+}
+
+// Always open the messengers on the permanent chat workspace.
+window-rule {
+    match app-id=r#"^signal$"#
+    open-on-workspace "chat"
 }
 
 // Rounded corners for all windows.
@@ -366,6 +385,14 @@ window-rule {
     open-floating true
     default-column-width { fixed 1080; }
     default-window-height { fixed 920; }
+}
+
+// The scanner GUI is a small utility window, not a column of work.
+window-rule {
+    match app-id="ch.jlmy.go_scanner"
+    open-floating true
+    default-column-width { fixed 900; }
+    default-window-height { fixed 620; }
 }
 
 debug {
@@ -392,6 +419,7 @@ binds {
     Mod+Return hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
     Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+D hotkey-overlay-title="Open Noctalia Launcher" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
+    Mod+N hotkey-overlay-title="Rename/remove workspace" { spawn-sh "~/.config/niri/scripts/rename-workspace.sh"; }
     Ctrl+Alt+L hotkey-overlay-title="Lock the Screen: Noctalia" { spawn "noctalia" "msg" "session" "lock"; }
     Mod+Shift+C hotkey-overlay-title="Restart Noctalia" { spawn-sh "pkill -x noctalia; exec noctalia"; }
 
@@ -404,7 +432,7 @@ binds {
     XF86AudioRaiseVolume allow-when-locked=true { spawn "noctalia" "msg" "volume-up" "10"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "noctalia" "msg" "volume-down" "10"; }
     XF86AudioMute        allow-when-locked=true { spawn "noctalia" "msg" "volume-mute"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn "noctalia" "msg" "mic-mute"; }
 
     XF86AudioPlay allow-when-locked=true { spawn "noctalia" "msg" "media" "toggle"; }
     XF86AudioStop allow-when-locked=true { spawn "noctalia" "msg" "media" "stop"; }
@@ -648,7 +676,8 @@ binds {
     Mod+Shift+E { quit; }
     Ctrl+Alt+Delete { quit; }
 
-    // Powers off the monitors. To turn them back on, do any input like
-    // moving the mouse or pressing any other key.
-    Mod+Shift+P { power-off-monitors; }
+    // Focus the YouTube PiP window and toggle follow mode across workspaces.
+    Mod+Shift+P hotkey-overlay-title="Toggle YouTube PiP follow mode" {
+        spawn-sh "/home/kevinzehnder/.cargo/bin/nirius focus --title '^Picture in picture$' && /home/kevinzehnder/.cargo/bin/nirius toggle-follow-mode";
+    }
 }

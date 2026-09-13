@@ -21,3 +21,29 @@ iperf3 -s -p <port>
 
 # Run iperf3 Client to test Connection to Server
 iperf3 -c <server> -p <port>
+
+
+% network, linux, nic, bridge, kz
+# Show Interface Addresses Briefly
+ip -br addr
+
+# Show Interface Link State Briefly
+ip -br link
+
+# Show Linux Bridge Members
+bridge link show
+
+# Show Members Of A Specific Bridge
+ls -l /sys/class/net/<bridge>/brif/
+
+# Show NIC Link Speed / Carrier
+ethtool <interface> | egrep 'Speed|Duplex|Auto-negotiation|Link detected|Port|MDI'
+
+# Show NIC Driver / Firmware / PCI Bus Info
+ethtool -i <interface>
+
+# Show ARP / Neighbor Cache For Interface
+ip neigh show dev <interface>
+
+# Ping Through A Specific Interface
+ping -c <count> -W <timeout> -I <interface> <target>

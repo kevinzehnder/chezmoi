@@ -126,7 +126,7 @@
     "default_model": {
       "enable_thinking": true,
       "provider": "openrouter",
-      "model": "anthropic/claude-haiku-4.5"
+      "model": "google/gemma-4-26b-a4b-it"
     },
     "favorite_models": [
       {

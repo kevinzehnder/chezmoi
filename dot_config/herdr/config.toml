@@ -17,3 +17,6 @@ previous_agent = "alt+k"
 next_agent = "alt+j"
 previous_tab = ["prefix+p", "alt+h"]
 next_tab = ["prefix+n", "alt+l"]
+
+[ui]
+sidebar_collapsed_mode = "compact"

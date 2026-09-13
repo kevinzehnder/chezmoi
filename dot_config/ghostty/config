@@ -2,7 +2,7 @@ font-family = IosevkaTerm NFP
 font-size = 13
 theme = dark:TokyoNight Storm,light:iTerm2 Solarized Light
 
-window-decoration = server
+window-decoration = none
 gtk-titlebar-hide-when-maximized = true
 
 keybind = alt+ctrl+k=previous_tab

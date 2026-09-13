@@ -6,6 +6,9 @@ started = [
 ]
 theme_mode_changed = "$HOME/.local/bin/noctalia-sync-gtk-theme.sh \"$NOCTALIA_THEME_MODE\""
 
+[wallpaper]
+directory = "~/wallpapers"
+
 [theme]
 mode = "auto"
 source = "custom"
@@ -20,6 +23,14 @@ sunset = "18:30"
 font_family = "Sans Serif"
 polkit_agent = true
 clipboard_enabled = true
+
+[shell.launcher.dmenu.entry.ssh]
+command = "awk '/^[[:space:]]*[Hh]ost[[:space:]]+/ {for (i=2;i<=NF;i++) if ($i !~ /[*?!]/) print $i}' ~/.ssh/config 2>/dev/null | sort -u"
+label = "SSH hosts"
+prefix = "/ssh"
+glyph = "terminal"
+global = false
+exec = "kitty -e ssh \"{selection}\""
 
 [shell.panel]
 transparency_mode = "soft"
@@ -54,6 +65,19 @@ capsule_opacity = 0.85
 start = ["launcher", "media"]
 center = ["workspaces"]
 end = ["tray", "notifications", "battery", "volume", "theme-toggle", "control-center", "clock", "session"]
+
+[widget.workspaces]
+style = "regular"
+show_labels = true
+label_source = "name"
+max_label_chars = 12
+labels_only_when_occupied = false
+hide_when_empty = false
+focused_color = "#b48ead"
+occupied_color = "#839496"
+empty_color = "#586e75"
+urgent_color = "#dc322f"
+focused_output_only = true
 
 [widget.theme-toggle]
 type = "custom_button"

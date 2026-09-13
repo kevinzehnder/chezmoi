@@ -36,3 +36,20 @@ rg <something> <directory>/
 rg -i <something>
 
 
+% journalctl, logs, kernel, kz
+# Show Kernel Logs From Current Boot
+journalctl -k -b
+
+# Show Kernel Logs From Previous Boot
+journalctl -k -b -1
+
+# Show Kernel Logs Since A Time
+journalctl -k -b --since "<since>"
+
+# Follow Kernel Logs Live
+journalctl -k -f
+
+# List Available Boots In Journal
+journalctl --list-boots
+
+

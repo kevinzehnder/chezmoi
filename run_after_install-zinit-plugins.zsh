@@ -1,0 +1,41 @@
+#!/usr/bin/env zsh
+# Install the locked x86_64 Zinit dependencies during chezmoi bootstrap.
+emulate -L zsh
+setopt pipefail
+
+readonly ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
+readonly LOCK_FILE="$ZINIT_HOME/.bootstrap-complete"
+
+if [[ "$(uname -m)" != "x86_64" ]]; then
+	print -u2 -- "Zinit plugin bootstrap is currently locked for x86_64 only; skipping."
+	exit 0
+fi
+
+if [[ ! -r "$ZINIT_HOME/zinit.zsh" ]]; then
+	print -u2 -- "Zinit plugin bootstrap: manager is not installed: $ZINIT_HOME"
+	exit 1
+fi
+
+source "$ZINIT_HOME/zinit.zsh"
+
+zinit ice nocompile ver"3918c6924810853d8a51ddfd7ab63d4b3359b63c"
+zinit light tinted-theming/tinted-fzf || exit 1
+
+zinit ice ver"2abe1f2f1cbcb3d3c6b879d849d683de5688111f"
+zinit light Aloxaf/fzf-tab || exit 1
+zinit ice ver"dcee72bb99b422bb8e4510f5087af9c1721392e4"
+zinit light zdharma-continuum/fast-syntax-highlighting || exit 1
+zinit ice ver"7fbdd25526afeefb0fc139fc012831211ed718bf"
+zinit light zsh-users/zsh-completions || exit 1
+zinit ice ver"85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5"
+zinit light zsh-users/zsh-autosuggestions || exit 1
+
+zinit ice as"program" from"gh-r" ver"v3.44.0"
+zinit light go-task/task || exit 1
+zinit ice as"program" from"gh-r" ver"0.10.0" pick"bin/cb"
+zinit light Slackadays/Clipboard || exit 1
+zinit ice as"command" from"gh-r" ver"v18.6.1" bpick"atuin-*.tar.gz" mv"atuin*/atuin -> atuin"
+zinit light atuinsh/atuin || exit 1
+
+print -r -- "zinit=f38e079f67c5a98d9ecf0e40f7971c7dc2c87003" > "$LOCK_FILE"
+print -r -- "Zinit locked dependencies installed"

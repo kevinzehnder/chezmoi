@@ -2,21 +2,47 @@
 # ZSH plugin management with zi
 #
 
+# Dependencies are installed by the pinned chezmoi bootstrap, never by startup.
+if [[ ! -f "$ZINIT_HOME/.bootstrap-complete" ]]; then
+	print -u2 -- "Zinit dependencies are not bootstrapped; run 'chezmoi apply'."
+	return 0
+fi
+
+typeset -a _zinit_required_plugins=(
+	tinted-theming---tinted-fzf
+	Aloxaf---fzf-tab
+	zdharma-continuum---fast-syntax-highlighting
+	zsh-users---zsh-completions
+	zsh-users---zsh-autosuggestions
+)
+[[ "$(uname -m)" == "x86_64" ]] && _zinit_required_plugins+=(
+	go-task---task
+	Slackadays---Clipboard
+)
+for _zinit_required_plugin in "${_zinit_required_plugins[@]}"; do
+	if [[ ! -d "${ZINIT_HOME:h}/plugins/$_zinit_required_plugin" ]]; then
+		print -u2 -- "Missing locked Zinit dependency: $_zinit_required_plugin; run 'chezmoi apply'."
+		return 0
+	fi
+done
+unset _zinit_required_plugin _zinit_required_plugins
+
+# Pinned to reviewed commits; upgrade deliberately by updating these locks.
 # Base plugins that need to be loaded first
 zinit for \
-	nocompile tinted-theming/tinted-fzf
+	nocompile ver"3918c6924810853d8a51ddfd7ab63d4b3359b63c" tinted-theming/tinted-fzf
 
 zinit wait lucid for \
-	Aloxaf/fzf-tab \
-	zdharma-continuum/fast-syntax-highlighting \
-	zsh-users/zsh-completions
+	ver"2abe1f2f1cbcb3d3c6b879d849d683de5688111f" Aloxaf/fzf-tab \
+	ver"dcee72bb99b422bb8e4510f5087af9c1721392e4" zdharma-continuum/fast-syntax-highlighting \
+	ver"7fbdd25526afeefb0fc139fc012831211ed718bf" zsh-users/zsh-completions
 
 # Architecture-specific tools
 ARCH=$(uname -m)
 if [[ "$ARCH" == "x86_64" ]]; then
 	zinit wait lucid as"program" from"gh-r" for \
-		go-task/task \
-		pick"bin/cb" Slackadays/Clipboard
+		ver"v3.44.0" go-task/task \
+		ver"0.10.0" pick"bin/cb" Slackadays/Clipboard
 fi
 
 {{- $osID := "" }}
@@ -41,6 +67,7 @@ zinit wait lucid as"program" from"gh-r" for \
 zinit for \
 	atinit"zicompinit -C; zicdreplay" \
 	blockf \
+	ver"85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5" \
 	zsh-users/zsh-autosuggestions
 
 # Additional tools available in pacman/aur (optional, commented out):

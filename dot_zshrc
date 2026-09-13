@@ -1,17 +1,21 @@
 # Initialize starship prompt
 eval "$(starship init zsh)"
 
-# initialize zinit plugin manager
+# Zinit is installed by chezmoi's pinned bootstrap script, never at shell startup.
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
-[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-source "${ZINIT_HOME}/zinit.zsh"
+if [[ -r "$ZINIT_HOME/zinit.zsh" ]]; then
+	source "$ZINIT_HOME/zinit.zsh"
+else
+	print -u2 -- "Zinit is not installed; run 'chezmoi apply' to install the pinned revision."
+fi
 
 # ZSH vi mode
 export ZVM_INIT_MODE=sourcing # vi mode for zsh
 
 # # Core configuration files (order matters)
-source "$HOME/.config/zsh/config.d/core/plugins.zsh"     # Zi plugins
+if (( ${+functions[zinit]} || ${+functions[zi]} )); then
+	source "$HOME/.config/zsh/config.d/core/plugins.zsh" # Zinit plugins
+fi
 source "$HOME/.config/zsh/config.d/core/options.zsh"     # ZSH options
 source "$HOME/.config/zsh/config.d/core/environment.zsh" # Environment variables
 source "$HOME/.config/zsh/config.d/core/keybindings.zsh" # Key bindings
@@ -27,14 +31,15 @@ if [ -d "$HOME/.config/zsh/config.d/other/" ]; then
 	unset conf
 fi
 
-# Load Atuin last (non-fatal on unsupported distros/arches)
-if command -v zinit > /dev/null 2>&1; then
-	zinit ice as"command" from"gh-r" bpick"atuin-*.tar.gz" mv"atuin*/atuin -> atuin"
-	zinit light atuinsh/atuin || true
-fi
-
-if command -v atuin > /dev/null 2>&1; then
+# Atuin is installed by the pinned bootstrap; do not let startup fetch it.
+ATUIN_ZINIT_DIR="${ZINIT_HOME:h}/plugins/atuinsh---atuin"
+if [[ -x "$ATUIN_ZINIT_DIR/atuin" ]]; then
+	typeset -U path
+	path=("$ATUIN_ZINIT_DIR" $path)
+	export PATH
 	source "$HOME/.config/zsh/config.d/core/atuin_init.zsh"
+else
+	print -u2 -- "Atuin is not bootstrapped; run 'chezmoi apply'."
 fi
 
 # direnv
@@ -46,10 +51,6 @@ if command -v zoxide > /dev/null 2>&1; then
 	eval "$(zoxide init zsh --cmd j)"
 fi
 
-# pnpm
-export PNPM_HOME="/home/kevinzehnder/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME/bin:"*) ;;
-  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
-esac
-# pnpm end
+
+# Added by Antigravity CLI installer
+export PATH="/home/kevinzehnder/.local/bin:$PATH"

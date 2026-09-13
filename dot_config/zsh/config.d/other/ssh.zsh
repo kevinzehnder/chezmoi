@@ -23,32 +23,60 @@ function s() {
 }
 
 function sshget() {
-	local server=$1
-	local remote_path=$2
-	[[ -z "$server" ]] && echo "need a fucking server" && return 1
+	emulate -L zsh
+	setopt pipefail
 
-	# Check if fd exists on remote, otherwise use find
-	local file_cmd="fd . ${remote_path:-~} -t f --color always"
-	if ! ssh "$server" "command -v fd > /dev/null"; then
-		file_cmd="find ${remote_path:-~} -type f | sort"
-		echo "fd not found on $server, falling back to find. Install fd for better performance."
+	local server="${1:-}"
+	local remote_path="${2:-}"
+	if [[ -z "$server" || "$server" == -* ]]; then
+		print -u2 -- "Usage: sshget <host> [remote-path]"
+		return 1
 	fi
 
-	local rl=$(ssh -tt "$server" "$file_cmd" 2> /dev/null \
-		| fzf --multi \
-			--ansi \
-			--height=80% \
-			--preview="ssh $server 'cat {}' 2>/dev/null" \
-			--preview-window=hidden:right:50%)
-
-	if [[ -n "$rl" ]]; then
-		mkdir -p sshget
-		echo "$rl" > /tmp/rsync_files_$$
-		local rsync_cmd="rsync -avz --progress --files-from=/tmp/rsync_files_$$ $server:/ ./sshget/"
-		echo "Running: $rsync_cmd"
-		eval $rsync_cmd
-		rm /tmp/rsync_files_$$
+	# Quote the local argument before it becomes part of the fixed remote command.
+	# With no path, resolve the remote user's home directory on the remote host.
+	local remote_path_quoted
+	if [[ -n "$remote_path" ]]; then
+		remote_path_quoted="${(q)remote_path}"
+	else
+		remote_path_quoted='$HOME'
 	fi
+
+	local remote_cmd="remote_path=\$(cd -- $remote_path_quoted && pwd -P) || exit 1
+if command -v fd >/dev/null 2>&1; then
+	fd -0 --type f --color never . \"\$remote_path\"
+else
+	find \"\$remote_path\" -type f -print0
+fi"
+
+	local file_list
+	file_list=$(mktemp "${TMPDIR:-/tmp}/sshget-files.XXXXXX") || return 1
+
+	# Read and retain NUL-delimited paths so spaces, quotes, and newlines survive.
+	ssh -T "$server" "$remote_cmd" \
+		| fzf --read0 --print0 --multi --height=80% > "$file_list"
+	local exit_status=$?
+	if (( exit_status != 0 )); then
+		rm -f -- "$file_list"
+		return "$exit_status"
+	fi
+
+	if [[ ! -s "$file_list" ]]; then
+		rm -f -- "$file_list"
+		return 0
+	fi
+
+	local destination="$PWD/sshget"
+	mkdir -p -- "$destination" || {
+		rm -f -- "$file_list"
+		return 1
+	}
+
+	# --from0 matches fzf's NUL output; no selected path is re-parsed as shell code.
+	rsync -avz --progress --from0 --files-from="$file_list" -- "$server:/" "$destination/"
+	exit_status=$?
+	rm -f -- "$file_list"
+	return "$exit_status"
 }
 
 function show_ssh_keys() {

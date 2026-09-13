@@ -61,12 +61,11 @@ export FZF_COMMON_OPTIONS="
 # Navi settings
 export NAVI_FZF_OVERRIDES='--with-nth 3,2,1 --height 70%'
 
-# pnpm
+# pnpm: the launcher lives in PNPM_HOME; global package binaries live in bin/.
 export PNPM_HOME="$HOME/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+typeset -U path
+path=("$PNPM_HOME/bin" "$PNPM_HOME" $path)
+export PATH
 
 # Bun
 export PATH="$HOME/.bun/bin:$PATH"

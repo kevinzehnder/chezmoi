@@ -5,6 +5,8 @@ LIGHT_GTK="Osaka-Light-Solarized"
 LIGHT_ICON="Papirus-Light"
 DARK_GTK="Tokyonight-Dark-Storm"
 DARK_ICON="Papirus-Dark"
+LIGHT_WALLPAPER="$HOME/wallpapers/light01.png"
+DARK_WALLPAPER="$HOME/wallpapers/dark01.png"
 
 mode=""
 arg="${1:-}"
@@ -27,13 +29,20 @@ fi
 
 NIRI_THEME_FILE="$HOME/.config/niri/noctalia.kdl"
 
+# libadwaita apps (Nautilus etc.) ignore gtk-theme; they only read ~/.config/gtk-4.0/
+link_gtk4() {
+  local theme_dir="$HOME/.themes/$1/gtk-4.0"
+  ln -sfn "$theme_dir/assets" "$HOME/.config/gtk-4.0/assets"
+  ln -sf "$theme_dir/gtk.css" "$HOME/.config/gtk-4.0/gtk.css"
+  ln -sf "$theme_dir/gtk-dark.css" "$HOME/.config/gtk-4.0/gtk-dark.css"
+}
+
 if [[ "$mode" == "prefer-dark" ]]; then
   gsettings set org.gnome.desktop.interface color-scheme "prefer-dark" 2>/dev/null || true
   gsettings set org.gnome.desktop.interface gtk-theme "$DARK_GTK" 2>/dev/null || true
   gsettings set org.gnome.desktop.interface icon-theme "$DARK_ICON" 2>/dev/null || true
-
-  gsettings set org.cinnamon.desktop.interface gtk-theme "$DARK_GTK" 2>/dev/null || true
-  gsettings set org.cinnamon.desktop.interface icon-theme "$DARK_ICON" 2>/dev/null || true
+  link_gtk4 "$DARK_GTK"
+  WALLPAPER="$DARK_WALLPAPER"
 
   cat > "$NIRI_THEME_FILE" <<'KDL'
 layout {
@@ -76,9 +85,8 @@ else
   gsettings set org.gnome.desktop.interface color-scheme "prefer-light" 2>/dev/null || true
   gsettings set org.gnome.desktop.interface gtk-theme "$LIGHT_GTK" 2>/dev/null || true
   gsettings set org.gnome.desktop.interface icon-theme "$LIGHT_ICON" 2>/dev/null || true
-
-  gsettings set org.cinnamon.desktop.interface gtk-theme "$LIGHT_GTK" 2>/dev/null || true
-  gsettings set org.cinnamon.desktop.interface icon-theme "$LIGHT_ICON" 2>/dev/null || true
+  link_gtk4 "$LIGHT_GTK"
+  WALLPAPER="$LIGHT_WALLPAPER"
 
   cat > "$NIRI_THEME_FILE" <<'KDL'
 layout {
@@ -120,3 +128,4 @@ KDL
 fi
 
 niri msg action load-config-file >/dev/null 2>&1 || true
+noctalia msg wallpaper-set "$WALLPAPER" >/dev/null 2>&1 || true

@@ -70,8 +70,8 @@ vim.keymap.set("n", "<C-right>", ":vertical resize -2<CR>", { desc = "Resize Win
 vim.keymap.set("n", "<C-left>", ":vertical resize +2<CR>", { desc = "Resize Window" })
 
 -- remap H and L
-vim.keymap.set("n", "H", "^", { desc = "Line Start" })
-vim.keymap.set("n", "L", "$", { desc = "Line End" })
+vim.keymap.set({ "n", "x", "o" }, "H", "^", { desc = "Line Start" })
+vim.keymap.set({ "n", "x", "o" }, "L", "g_", { desc = "Line End" })
 
 -- harpoon
 vim.keymap.set("n", "<leader>hh", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", { desc = "Menu" })
