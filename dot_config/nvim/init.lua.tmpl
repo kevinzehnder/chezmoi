@@ -85,6 +85,17 @@ require("lazy").setup({
   },
   { "kylechui/nvim-surround", version = "*", opts = {} },
   {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {},
+  },
+  {
+    "ishan9299/nvim-solarized-lua",
+    lazy = false,
+    priority = 1000,
+  },
+  {
     "nvim-telescope/telescope.nvim",
     tag = "0.1.8",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -100,6 +111,41 @@ require("lazy").setup({
   checker = { enabled = false },
   change_detection = { notify = false },
 })
+
+-- Keep the server profile's visual behavior aligned with the workstation
+-- profile without importing its development-plugin configuration.
+local function set_colorscheme(name)
+  if not pcall(vim.cmd.colorscheme, name) then
+    vim.cmd("colorscheme habamax")
+  end
+end
+
+local uv = vim.uv or vim.loop
+
+local function set_adaptive_colorscheme()
+  if uv.fs_stat(vim.fn.expand("~/.lightmode")) then
+    vim.o.background = "light"
+    set_colorscheme("solarized")
+    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#ffd8cb" })
+  else
+    vim.o.background = "dark"
+    set_colorscheme("tokyonight")
+  end
+end
+
+set_adaptive_colorscheme()
+vim.cmd("highlight TSFunction gui=bold")
+
+vim.api.nvim_create_user_command("Light", function()
+  vim.o.background = "light"
+  set_colorscheme("solarized")
+  vim.api.nvim_set_hl(0, "CursorLine", { bg = "#ffd8cb" })
+end, { desc = "Switch to light-mode colors" })
+
+vim.api.nvim_create_user_command("Dark", function()
+  vim.o.background = "dark"
+  set_colorscheme("tokyonight")
+end, { desc = "Switch to dark-mode colors" })
 {{- else }}
 require("config.main")
 require("config.autocmds")
