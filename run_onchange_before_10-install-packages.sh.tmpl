@@ -17,9 +17,13 @@ run_privileged() {
 }
 
 install_starship() {
-  if ! command -v starship >/dev/null 2>&1; then
-    curl -fsSL https://starship.rs/install.sh | run_privileged sh -s -- -y
+  # Non-interactive sudo/Ansible environments can omit /usr/local/bin from
+  # PATH even though the Starship installer places its binary there.
+  if command -v starship >/dev/null 2>&1 || [[ -x /usr/local/bin/starship ]]; then
+    return
   fi
+
+  curl -fsSL https://starship.rs/install.sh | run_privileged sh -s -- -y
 }
 
 install_server_packages() {
