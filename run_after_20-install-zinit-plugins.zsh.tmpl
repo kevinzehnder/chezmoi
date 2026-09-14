@@ -3,6 +3,10 @@
 emulate -L zsh
 setopt pipefail
 
+if [[ "{{ default "workstation" .dotfiles_profile }}" != "workstation" ]]; then
+	exit 0
+fi
+
 readonly ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
 readonly LOCK_FILE="$ZINIT_HOME/.bootstrap-complete"
 
