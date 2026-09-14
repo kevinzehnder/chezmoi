@@ -1,1 +1,43 @@
+{{ $profile := default "workstation" .dotfiles_profile }}
+{{ $desktop := default false .dotfiles_desktop }}
 README.md
+.claude
+
+{{ if ne $profile "workstation" }}
+# Server-only exclusions: retain a small terminal profile and avoid deploying
+# development, desktop, and workstation-only shell configuration.
+.config/atuin
+.config/base16
+.config/direnv
+.config/navi
+.config/nvim/init_vscode.vim
+.config/nvim/lua
+.config/procs
+.config/systemd/user
+.config/television
+.config/zsh/completions
+.config/zsh/config.d
+.config/zellij
+.config/zed
+.local/bin/apply-icc-vcgt-wayland.sh
+.local/bin/lock-on-sleep.sh
+.local/bin/noctalia-sync-gtk-theme.sh
+.obsidian.vimrc
+{{ end }}
+
+{{ if eq $profile "workstation" }}
+# These standalone helpers are used only by the minimal server Zsh profile.
+.config/zsh/fzf.zsh
+.config/zsh/systemd-tools.zsh
+{{ end }}
+
+{{ if not $desktop }}
+# Graphical overlay: absent on servers and remote/headless workstations.
+.config/ghostty
+.config/kitty
+.config/niri
+.config/noctalia
+.local/bin/apply-icc-vcgt-wayland.sh
+.local/bin/lock-on-sleep.sh
+.local/bin/noctalia-sync-gtk-theme.sh
+{{ end }}

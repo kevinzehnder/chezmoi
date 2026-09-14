@@ -1,3 +1,23 @@
+{{- if eq (default "workstation" .dotfiles_profile) "server" }}
+# Managed by Ansible: roles/server_dotfiles
+set -g default-terminal "screen-256color"
+set -g history-limit 50000
+set -g mouse on
+set -g status-keys vi
+set -g mode-keys vi
+set -g renumber-windows on
+set -g base-index 1
+setw -g pane-base-index 1
+set -g escape-time 10
+
+bind r source-file ~/.tmux.conf \; display-message "tmux config reloaded"
+bind | split-window -h
+bind - split-window -v
+bind -n C-h select-pane -L
+bind -n C-j select-pane -D
+bind -n C-k select-pane -U
+bind -n C-l select-pane -R
+{{- else }}
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
@@ -67,3 +87,4 @@ set -g window-status-current-format " #[fg=colour4]󰻃 #{window_index}:#{window
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
 
+{{- end }}

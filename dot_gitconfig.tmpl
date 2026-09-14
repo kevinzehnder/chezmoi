@@ -1,0 +1,25 @@
+[core]
+    editor = nvim
+[init]
+    defaultBranch = main
+[pull]
+    rebase = false
+[push]
+    autoSetupRemote = true
+[fetch]
+    prune = true
+{{- if eq (default "workstation" .dotfiles_profile) "workstation" }}
+[user]
+    email = kevin.zehnder@jlmy.ch
+    name = kevinzehnder
+[credential "https://github.com"]
+    helper =
+    helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+    helper =
+    helper = !/usr/bin/gh auth git-credential
+{{- else if and (index . "server_dotfiles_git_name") (index . "server_dotfiles_git_email") }}
+[user]
+    name = {{ index . "server_dotfiles_git_name" }}
+    email = {{ index . "server_dotfiles_git_email" }}
+{{- end }}

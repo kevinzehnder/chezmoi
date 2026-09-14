@@ -1,3 +1,51 @@
+{{- if eq (default "workstation" .dotfiles_profile) "server" }}
+# Managed by Chezmoi: server profile
+export PATH="$HOME/.local/bin:$PATH"
+export EDITOR=nvim
+export VISUAL=nvim
+export PAGER=less
+export LESS="-FRX"
+
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt append_history share_history hist_ignore_dups hist_reduce_blanks
+
+autoload -Uz compinit
+compinit
+
+if [[ -r "$HOME/.config/zsh/fzf.zsh" ]]; then
+  source "$HOME/.config/zsh/fzf.zsh"
+fi
+
+# The server profile is self-contained; these helpers need no plugin manager.
+check_sudo_nopass() {
+  sudo -n true 2>/dev/null
+}
+if [[ -r "$HOME/.config/zsh/systemd-tools.zsh" ]]; then
+  source "$HOME/.config/zsh/systemd-tools.zsh"
+fi
+
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
+alias v='nvim'
+alias vi='nvim'
+alias vim='nvim'
+alias ll='ls -lah'
+alias la='ls -A'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias gs='git status -sb'
+alias gl='git log --oneline --decorate -20'
+alias gd='git diff'
+
+if command -v dircolors >/dev/null 2>&1; then
+  eval "$(dircolors -b)"
+  alias ls='ls --color=auto'
+fi
+{{- else }}
 # Initialize starship prompt
 eval "$(starship init zsh)"
 
@@ -54,3 +102,4 @@ fi
 
 # Added by Antigravity CLI installer
 export PATH="/home/kevinzehnder/.local/bin:$PATH"
+{{- end }}

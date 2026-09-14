@@ -1,0 +1,115 @@
+{{- if eq (default "workstation" .dotfiles_profile) "server" }}
+-- Managed by Ansible: roles/server_dotfiles
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.mouse = "a"
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.smartindent = true
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+vim.opt.tabstop = 2
+vim.opt.undofile = true
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+vim.opt.scrolloff = 8
+vim.opt.signcolumn = "yes"
+vim.opt.updatetime = 250
+vim.opt.termguicolors = true
+
+-- Keep the portable subset of the workstation keymaps. These mappings only
+-- depend on Neovim itself or plugins installed below.
+vim.keymap.set("n", "<leader>x", "<cmd>qa<cr>", { desc = "Quit all" })
+vim.keymap.set("n", "<leader>q", "<cmd>quit<cr>", { desc = "Quit" })
+vim.keymap.set("n", "<leader>w", "<cmd>write<cr>", { desc = "Write" })
+vim.keymap.set("n", "<leader>h", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
+vim.keymap.set("n", "<leader>e", "<cmd>Ex<cr>", { desc = "Explorer" })
+vim.keymap.set("n", "<leader>c", "<cmd>bdelete<cr>", { desc = "Close buffer" })
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<cr>")
+vim.keymap.set("n", "<A-j>", "<cmd>cnext<cr>zz", { desc = "Next quickfix" })
+vim.keymap.set("n", "<A-9>", "<cmd>cnext<cr>zz", { desc = "Next quickfix" })
+vim.keymap.set("n", "<A-k>", "<cmd>cprevious<cr>zz", { desc = "Previous quickfix" })
+vim.keymap.set("n", "<A-8>", "<cmd>cprevious<cr>zz", { desc = "Previous quickfix" })
+vim.keymap.set("n", "<A-N>", function()
+  for _, window in pairs(vim.fn.getwininfo()) do
+    if window.quickfix == 1 then
+      vim.cmd("cclose")
+      return
+    end
+  end
+  vim.cmd("copen")
+end, { desc = "Toggle quickfix" })
+vim.keymap.set("n", "H", "^", { desc = "Line start" })
+vim.keymap.set("n", "L", "$", { desc = "Line end" })
+vim.keymap.set("x", "p", '"_dP')
+vim.keymap.set("x", "<leader>p", "p", { desc = "Paste" })
+vim.keymap.set("n", "n", "nzz")
+vim.keymap.set("n", "N", "Nzz")
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "Q", "<nop>")
+vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = "Replace word" })
+vim.keymap.set("n", "<leader>T", [[:s/\<./\u&/g<cr>:nohl<cr>]], { desc = "Title case line" })
+vim.keymap.set("n", "<A-down>", ":resize -2<cr>")
+vim.keymap.set("n", "<A-up>", ":resize +2<cr>")
+vim.keymap.set("n", "<A-right>", ":vertical resize -2<cr>")
+vim.keymap.set("n", "<A-left>", ":vertical resize +2<cr>")
+vim.keymap.set("n", "<C-down>", ":resize -2<cr>")
+vim.keymap.set("n", "<C-up>", ":resize +2<cr>")
+vim.keymap.set("n", "<C-right>", ":vertical resize -2<cr>")
+vim.keymap.set("n", "<C-left>", ":vertical resize +2<cr>")
+vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Focus left split" })
+vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Focus lower split" })
+vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Focus upper split" })
+vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Focus right split" })
+vim.keymap.set("i", "<C-l>", "<Right>")
+vim.keymap.set("i", "<C-k>", "<Up>")
+
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  vim.fn.system({
+    "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require("lazy").setup({
+  {
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = { options = { theme = "auto" } },
+  },
+  { "kylechui/nvim-surround", version = "*", opts = {} },
+  {
+    "nvim-telescope/telescope.nvim",
+    tag = "0.1.8",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Search text" },
+      { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+      { "<C-f>", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search buffer" },
+      { "<C-p>", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+    },
+  },
+}, {
+  checker = { enabled = false },
+  change_detection = { notify = false },
+})
+{{- else }}
+require("config.main")
+require("config.autocmds")
+require("config.lazy")
+require("config.colors")
+require("config.keymaps")
+
+if vim.g.neovide then
+	-- vim.g.neovide_theme = "auto"
+	vim.o.guifont = "IosevkaTerm_Nerd_Font" -- text below applies for VimScript
+	vim.api.nvim_set_keymap("n", "<F11>", ":let g:neovide_fullscreen = !g:neovide_fullscreen<CR>", {})
+end
+{{- end }}

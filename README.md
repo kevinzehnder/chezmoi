@@ -2,24 +2,23 @@
 
 [![Managed by chezmoi](https://img.shields.io/badge/managed%20by-chezmoi-blue.svg)](https://www.chezmoi.io/)
 
-Personal dotfiles managed by chezmoi with unified OS detection and package management.
+Personal dotfiles managed by Chezmoi. The source has one terminal/common base
+and two purpose-specific profiles:
 
-## Supported Systems
+- **`server`** — minimal terminal configuration for Debian/Ubuntu and
+  RHEL/AlmaLinux/Rocky servers.
+- **`workstation`** — Arch Linux development environment. Its optional
+  **desktop overlay** supplies Niri, Noctalia, Kitty, Ghostty, and graphical
+  user services.
 
-- Arch Linux (+ AUR via yay)
-- Ubuntu/Debian (apt)
-- RHEL/AlmaLinux/Rocky/CentOS (dnf/yum + EPEL)
-- Fedora (dnf)
-
-## Bootstrap
+A remote development LXC such as Hicks uses `workstation` with the desktop
+overlay disabled. Archtower uses the desktop overlay. Server and workstation
+profiles are normally selected by the corresponding Peterpan Ansible role;
+manual use can pass the same Chezmoi data:
 
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply kevinzehnder/chezmoi
+chezmoi --override-data '{"dotfiles_profile":"workstation","dotfiles_desktop":true}' init --apply kevinzehnder/chezmoi
 ```
 
-## Structure
-
-- `.chezmoidata.yaml` - OS-specific package mappings
-- `run_once_before_install-packages.sh.tmpl` - Unified bootstrap using `{{ .chezmoi.osRelease.id }}`
-
-
+Profile package installation is a change-triggered Chezmoi script. It installs
+required packages but deliberately does not perform a full system upgrade.

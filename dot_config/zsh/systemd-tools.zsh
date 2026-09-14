@@ -140,15 +140,15 @@ EOF
 		force_sudo="0"
 	fi
 
-	local -a ctl=(systemctl)
-	local -a jctl=(journalctl)
+	local ctl="systemctl"
+	local jctl="journalctl"
 	if [[ "$mode" == "user" ]]; then
-		ctl=(systemctl --user)
-		jctl=(journalctl --user)
+		ctl="systemctl --user"
+		jctl="journalctl --user"
 	elif [[ "$force_sudo" == "1" ]]; then
-		ctl=(sudo systemctl)
-		jctl=(sudo journalctl)
-		check_sudo_nopass || sudo -v || return 1
+		ctl="sudo systemctl"
+		jctl="sudo journalctl"
+		check_sudo_nopass || sudo -v
 	fi
 
 	local type_filter=""
@@ -160,66 +160,42 @@ EOF
 		type_filter="service,socket,timer,target,path"
 	fi
 
-	# --type used to be interpolated into eval. Keep the supported types explicit.
-	local requested_unit_type
-	for requested_unit_type in ${(s:,:)type_filter}; do
-		case "$requested_unit_type" in
-			service|socket|timer|target|path|mount|automount|swap|device|slice|scope)
-				;;
-			"")
-				;;
-			*)
-				print -u2 -- "Unsupported systemd unit type: $requested_unit_type"
-				return 2
-				;;
-		esac
-	done
-
-	local -a list_args
+	local list_cmd
 	if [[ -n "$enabled" ]]; then
-		list_args=(list-unit-files --all --no-pager --plain --legend=false)
+		list_cmd="$ctl list-unit-files --all --no-pager --plain --legend=false"
+		[[ -n "$type_filter" ]] && list_cmd+=" --type=$type_filter"
 	else
-		list_args=(list-units --all --no-pager --plain --legend=false)
-		[[ -n "$active" ]] && list_args+=(--state=active)
+		list_cmd="$ctl list-units --all --no-pager --plain --legend=false"
+		[[ -n "$type_filter" ]] && list_cmd+=" --type=$type_filter"
+		[[ -n "$active" ]] && list_cmd+=" --state=active"
 	fi
-	[[ -n "$type_filter" ]] && list_args+=("--type=$type_filter")
 
-	# FZF actions run in a child shell. All interpolated pieces here are static
-	# command arrays or validated unit types; the listing itself needs no eval.
-	local -a quoted_ctl quoted_jctl quoted_list_args
-	quoted_ctl=("${(@q)ctl}")
-	quoted_jctl=("${(@q)jctl}")
-	quoted_list_args=("${(@q)list_args}")
-	local ctl_cmd="${(j: :)quoted_ctl}"
-	local jctl_cmd="${(j: :)quoted_jctl}"
-	local list_pipe="${ctl_cmd} ${(j: :)quoted_list_args} | awk '{print \$1}' | sed '/^$/d'"
+	local list_pipe="$list_cmd | awk '{print \$1}' | sed '/^$/d'"
 
 	local follow_logs
 	local logs
 	if command -v tspin > /dev/null 2>&1; then
-		follow_logs="$jctl_cmd -n 100 -f -u {1} | tspin"
-		logs="$jctl_cmd -n 2000 -u {1} | tspin | less -r +G"
+		follow_logs="$jctl -n 100 -f -u {1} | tspin"
+		logs="$jctl -n 2000 -u {1} | tspin | less -r +G"
 	else
-		follow_logs="$jctl_cmd -n 100 -f -u {1}"
-		logs="$jctl_cmd -n 2000 -e -u {1}"
+		follow_logs="$jctl -n 100 -f -u {1}"
+		logs="$jctl -n 2000 -e -u {1}"
 	fi
 
-	local show_status="$ctl_cmd status {1} --no-pager"
-	local edit_cmd="$ctl_cmd edit {1} --full || read -p 'Press enter...'"
-	local start_cmd="$ctl_cmd start {1} || read -p 'Failed. Press enter...'"
-	local stop_cmd="$ctl_cmd stop {1} || read -p 'Failed. Press enter...'"
-	local restart_cmd="$ctl_cmd restart {1} || read -p 'Failed. Press enter...'"
-	local enable_cmd="$ctl_cmd enable {1} && echo 'Enabled {1}' || echo 'Failed to enable {1}'; read -p 'Press enter...'"
-	local disable_cmd="$ctl_cmd disable {1} && echo 'Disabled {1}' || echo 'Failed to disable {1}'; read -p 'Press enter...'"
+	local show_status="$ctl status {1} --no-pager"
+	local edit_cmd="$ctl edit {1} --full || read -p 'Press enter...'"
+	local start_cmd="$ctl start {1} || read -p 'Failed. Press enter...'"
+	local stop_cmd="$ctl stop {1} || read -p 'Failed. Press enter...'"
+	local restart_cmd="$ctl restart {1} || read -p 'Failed. Press enter...'"
+	local enable_cmd="$ctl enable {1} && echo 'Enabled {1}' || echo 'Failed to enable {1}'; read -p 'Press enter...'"
+	local disable_cmd="$ctl disable {1} && echo 'Disabled {1}' || echo 'Failed to disable {1}'; read -p 'Press enter...'"
 
 	local title="System Units"
 	[[ "$mode" == "user" ]] && title="User Units"
 	[[ "$force_sudo" == "1" && "$mode" != "user" ]] && title="System Units (sudo)"
 	local header="${title}"$' | CTRL-R: reload\nCTRL-L: journal | CTRL-F: follow logs | CTRL-E: edit\nCTRL-S: start | CTRL-D: stop | CTRL-T: restart\nCTRL-N: enable | CTRL-X: disable'
 
-	"${ctl[@]}" "${list_args[@]}" \
-		| awk '{print $1}' \
-		| sed '/^$/d' \
+	eval "$list_pipe" \
 		| fzf --ansi \
 			--preview "$show_status" \
 			--preview-window=right:60%:wrap:follow \

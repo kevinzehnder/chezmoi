@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Install packages for the selected Chezmoi profile. This script is deliberately
+# change-triggered (not run-once): changing a rendered package set converges an
+# existing host without performing a full system upgrade.
+set -euo pipefail
+
+PROFILE="{{ default "workstation" .dotfiles_profile }}"
+DESKTOP="{{ default false .dotfiles_desktop }}"
+OS_ID="{{ .chezmoi.osRelease.id | lower }}"
+
+run_privileged() {
+  if [[ $EUID -eq 0 ]]; then
+    "$@"
+  else
+    sudo "$@"
+  fi
+}
+
+install_starship() {
+  if ! command -v starship >/dev/null 2>&1; then
+    curl -fsSL https://starship.rs/install.sh | run_privileged sh -s -- -y
+  fi
+}
+
+install_server_packages() {
+  case "$OS_ID" in
+    ubuntu|debian)
+      local packages=(
+{{- range .packages.server.common }}
+        "{{ . }}"
+{{- end }}
+{{- range .packages.server.debian }}
+        "{{ . }}"
+{{- end }}
+      )
+      run_privileged apt-get update
+      run_privileged apt-get install -y "${packages[@]}"
+      ;;
+    rhel|almalinux|rocky|centos)
+      local repository_packages=(
+{{- range .packages.server.redhat }}
+        "{{ . }}"
+{{- end }}
+      )
+      local packages=(
+{{- range .packages.server.common }}
+        "{{ . }}"
+{{- end }}
+      )
+      run_privileged dnf install -y "${repository_packages[@]}"
+      run_privileged dnf makecache
+      run_privileged dnf install -y "${packages[@]}"
+      ;;
+    *)
+      echo "server profile does not support OS ID: $OS_ID" >&2
+      exit 1
+      ;;
+  esac
+  install_starship
+}
+
+install_workstation_packages() {
+  if [[ "$OS_ID" != "arch" ]]; then
+    echo "workstation profile requires Arch Linux, got: $OS_ID" >&2
+    exit 1
+  fi
+
+  local packages=(
+{{- range .packages.workstation.arch }}
+    "{{ . }}"
+{{- end }}
+  )
+
+  if [[ "$DESKTOP" == "true" ]]; then
+    packages+=(
+{{- range .packages.workstation.desktop }}
+      "{{ . }}"
+{{- end }}
+    )
+  fi
+
+  # Earlier linux_baseline versions installed a release binary directly at
+  # /usr/bin/procs. Remove only that unmanaged file so pacman can take over.
+  if [[ -e /usr/bin/procs ]] && ! pacman -Qo /usr/bin/procs >/dev/null 2>&1; then
+    run_privileged rm -f /usr/bin/procs
+  fi
+
+  run_privileged pacman -S --needed --noconfirm "${packages[@]}"
+}
+
+case "$PROFILE" in
+  server)
+    install_server_packages
+    ;;
+  workstation)
+    install_workstation_packages
+    ;;
+  *)
+    echo "unknown dotfiles profile: $PROFILE" >&2
+    exit 1
+    ;;
+esac
