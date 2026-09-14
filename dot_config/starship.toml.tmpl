@@ -213,3 +213,16 @@ format = '[$symbol$state](bold blue) '
 
 
 {{- end }}
+
+# Starship's built-in container module reduces LXC and systemd-nspawn to the
+# confusing label “Systemd”. Render the actual detected virtualization instead.
+[container]
+disabled = true
+
+[custom.virtualization]
+command = "systemd-detect-virt | tr '[:lower:]' '[:upper:]'"
+when = "test -r /run/systemd/container"
+format = "[$symbol [$output]]($style) "
+symbol = "⬢"
+style = "bold red dimmed"
+description = "Container virtualization type"
