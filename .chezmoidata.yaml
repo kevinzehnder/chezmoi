@@ -40,6 +40,7 @@ packages:
       - wget
       - tmux
       - neovim
+      - tree-sitter-cli
       - jq
       - direnv
       - eza
