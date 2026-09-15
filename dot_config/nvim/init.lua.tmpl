@@ -26,7 +26,7 @@ vim.keymap.set("n", "<leader>x", "<cmd>qa<cr>", { desc = "Quit all" })
 vim.keymap.set("n", "<leader>q", "<cmd>quit<cr>", { desc = "Quit" })
 vim.keymap.set("n", "<leader>w", "<cmd>write<cr>", { desc = "Write" })
 vim.keymap.set("n", "<leader>h", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
-vim.keymap.set("n", "<leader>e", "<cmd>Ex<cr>", { desc = "Explorer" })
+vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr><cmd>wincmd p<cr>", { desc = "Toggle Neo-tree" })
 vim.keymap.set("n", "<leader>c", "<cmd>bdelete<cr>", { desc = "Close buffer" })
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<cr>")
 vim.keymap.set("n", "<A-j>", "<cmd>cnext<cr>zz", { desc = "Next quickfix" })
@@ -96,6 +96,23 @@ require("lazy").setup({
     priority = 1000,
   },
   {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
+    opts = {
+      filesystem = {
+        follow_current_file = { enabled = true, leave_dirs_open = true },
+      },
+      buffers = {
+        follow_current_file = { enabled = true, leave_dirs_open = false },
+      },
+    },
+  },
+  {
     "nvim-telescope/telescope.nvim",
     tag = "0.1.8",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -121,9 +138,10 @@ local function set_colorscheme(name)
 end
 
 local uv = vim.uv or vim.loop
+local lightmode_marker = vim.fn.expand("~/.lightmode")
 
 local function set_adaptive_colorscheme()
-  if uv.fs_stat(vim.fn.expand("~/.lightmode")) then
+  if uv.fs_stat(lightmode_marker) then
     vim.o.background = "light"
     set_colorscheme("solarized")
     vim.api.nvim_set_hl(0, "CursorLine", { bg = "#ffd8cb" })
@@ -137,15 +155,17 @@ set_adaptive_colorscheme()
 vim.cmd("highlight TSFunction gui=bold")
 
 vim.api.nvim_create_user_command("Light", function()
+  vim.fn.writefile({}, lightmode_marker)
   vim.o.background = "light"
   set_colorscheme("solarized")
   vim.api.nvim_set_hl(0, "CursorLine", { bg = "#ffd8cb" })
-end, { desc = "Switch to light-mode colors" })
+end, { desc = "Switch to persistent light-mode colors" })
 
 vim.api.nvim_create_user_command("Dark", function()
+  vim.fn.delete(lightmode_marker)
   vim.o.background = "dark"
   set_colorscheme("tokyonight")
-end, { desc = "Switch to dark-mode colors" })
+end, { desc = "Switch to persistent dark-mode colors" })
 {{- else }}
 require("config.main")
 require("config.autocmds")

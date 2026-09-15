@@ -18,6 +18,18 @@ if [[ -r "$HOME/.config/zsh/fzf.zsh" ]]; then
   source "$HOME/.config/zsh/fzf.zsh"
 fi
 
+# Persist the Neovim color preference without bringing in workstation theming.
+# New Neovim sessions read this marker; use :Light or :Dark in a running one.
+light() {
+  command touch "$HOME/.lightmode"
+  print 'Light mode enabled for new Neovim sessions.'
+}
+
+dark() {
+  command rm -f "$HOME/.lightmode"
+  print 'Dark mode enabled for new Neovim sessions.'
+}
+
 # The server profile is self-contained; these helpers need no plugin manager.
 check_sudo_nopass() {
   sudo -n true 2>/dev/null
