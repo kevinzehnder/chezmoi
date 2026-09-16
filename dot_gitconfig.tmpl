@@ -8,7 +8,7 @@
     autoSetupRemote = true
 [fetch]
     prune = true
-{{- if eq (default "workstation" .dotfiles_profile) "workstation" }}
+{{- if eq (default "workstation" (get . "dotfiles_profile")) "workstation" }}
 [user]
     email = kevin.zehnder@jlmy.ch
     name = kevinzehnder

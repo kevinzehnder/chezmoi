@@ -1,5 +1,5 @@
-{{ $profile := default "workstation" .dotfiles_profile }}
-{{ $desktop := default false .dotfiles_desktop }}
+{{ $profile := default "workstation" (get . "dotfiles_profile") }}
+{{ $desktop := default false (get . "dotfiles_desktop") }}
 README.md
 .claude
 

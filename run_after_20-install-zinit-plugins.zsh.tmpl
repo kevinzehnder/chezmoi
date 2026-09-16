@@ -3,7 +3,7 @@
 emulate -L zsh
 setopt pipefail
 
-if [[ "{{ default "workstation" .dotfiles_profile }}" != "workstation" ]]; then
+if [[ "{{ default "workstation" (get . "dotfiles_profile") }}" != "workstation" ]]; then
 	exit 0
 fi
 

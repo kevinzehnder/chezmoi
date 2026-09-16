@@ -1,4 +1,4 @@
-{{- if eq (default "workstation" .dotfiles_profile) "server" }}
+{{- if eq (default "workstation" (get . "dotfiles_profile")) "server" }}
 # Managed by Ansible: roles/server_dotfiles
 right_format = "$kubernetes"
 

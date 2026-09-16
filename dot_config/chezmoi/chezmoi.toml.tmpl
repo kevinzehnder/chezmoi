@@ -10,8 +10,8 @@
     osid = "{{ .chezmoi.osRelease.id }}"
     arch = "{{ .chezmoi.arch }}"
     hostname = "{{ .chezmoi.hostname }}"
-    dotfiles_profile = "{{ default "workstation" .dotfiles_profile }}"
-    dotfiles_desktop = {{ default false .dotfiles_desktop }}
+    dotfiles_profile = "{{ default "workstation" (get . "dotfiles_profile") }}"
+    dotfiles_desktop = {{ default false (get . "dotfiles_desktop") }}
 
 # --- Examples for future use ---
 

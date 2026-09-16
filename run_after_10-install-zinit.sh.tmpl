@@ -2,7 +2,7 @@
 # Install Zinit only during an explicit chezmoi apply, pinned to a reviewed commit.
 set -euo pipefail
 
-if [[ "{{ default "workstation" .dotfiles_profile }}" != "workstation" ]]; then
+if [[ "{{ default "workstation" (get . "dotfiles_profile") }}" != "workstation" ]]; then
     exit 0
 fi
 

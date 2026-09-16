@@ -4,8 +4,8 @@
 # existing host without performing a full system upgrade.
 set -euo pipefail
 
-PROFILE="{{ default "workstation" .dotfiles_profile }}"
-DESKTOP="{{ default false .dotfiles_desktop }}"
+PROFILE="{{ default "workstation" (get . "dotfiles_profile") }}"
+DESKTOP="{{ default false (get . "dotfiles_desktop") }}"
 OS_ID="{{ .chezmoi.osRelease.id | lower }}"
 
 run_privileged() {
