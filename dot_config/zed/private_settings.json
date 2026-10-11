@@ -7,12 +7,22 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "ssh_connections": [
+    {
+      "host": "hicks",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/home/kevinzehnder/moneymaker"
+          ]
+        }
+      ]
+    }
+  ],
   "proxy": "",
   "edit_predictions": {
-    "open_ai_compatible_api": {
-      "api_url": "https://openrouter.ai/api/v1/chat/completions",
-      "model": "openai/gpt-5-nano"
-    }
+    "provider": "zed"
   },
   "context_server_timeout": 90,
   "outline_panel": {
@@ -46,18 +56,6 @@
         "/home/kevinzehnder/.mozilla/firefox/pi-mitmproxy-mcp-profile",
         "--startUrl",
         "about:home"
-      ]
-    }
-  },
-  "language_models": {
-    "openrouter": {
-      "api_url": "https://openrouter.ai/api/v1",
-      "available_models": [
-        {
-          "name": "arcee-ai/trinity-large-preview:free",
-          "display_name": "arcee-ai/trinity-large-preview:free",
-          "max_tokens": 163800
-        }
       ]
     }
   },
@@ -124,9 +122,10 @@
     "default_profile": "ask",
     "tool_permissions": {},
     "default_model": {
+      "effort": "max",
       "enable_thinking": true,
       "provider": "openrouter",
-      "model": "google/gemma-4-26b-a4b-it"
+      "model": "z-ai/glm-5.3-flash"
     },
     "favorite_models": [
       {
