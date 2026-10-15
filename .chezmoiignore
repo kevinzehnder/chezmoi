@@ -3,6 +3,9 @@
 README.md
 .claude
 
+# Machine-local environment and secrets: never import or deploy this file.
+.zshenv
+
 {{ if ne $profile "workstation" }}
 # Server-only exclusions: retain a small terminal profile and avoid deploying
 # development, desktop, and workstation-only shell configuration.
