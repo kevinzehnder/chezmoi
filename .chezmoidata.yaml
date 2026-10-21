@@ -18,6 +18,7 @@ packages:
       - sudo
       - tmux
       - fzf
+      - less
       - ripgrep
       - jq
       - neovim

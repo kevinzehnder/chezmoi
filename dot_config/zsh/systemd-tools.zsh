@@ -63,19 +63,26 @@ function timers() {
 }
 
 function jctl() {
+	# System journal access is commonly restricted; authenticate before piping
+	# through the pager so sudo never prompts after the pipeline has started.
+	check_sudo_nopass || sudo -v || return 1
 	if command -v tspin > /dev/null 2>&1; then
-		journalctl -n 2000 "$@" | tspin | less -r +G
+		sudo journalctl -n 2000 "$@" | tspin | less -r +G
 	else
-		journalctl -n 2000 "$@"
+		sudo journalctl -n 2000 "$@" | less -R +G
+	fi
+}
+
+function ujctl() {
+	if command -v tspin > /dev/null 2>&1; then
+		journalctl --user -n 2000 "$@" | tspin | less -r +G
+	else
+		journalctl --user -n 2000 "$@" | less -R +G
 	fi
 }
 
 function sjctl() {
-	if command -v tspin > /dev/null 2>&1; then
-		sudo journalctl -n 2000 "$@" | tspin | less -r +G
-	else
-		sudo journalctl -n 2000 "$@"
-	fi
+	jctl "$@"
 }
 
 # pretty journal
@@ -145,10 +152,13 @@ EOF
 	if [[ "$mode" == "user" ]]; then
 		ctl="systemctl --user"
 		jctl="journalctl --user"
-	elif [[ "$force_sudo" == "1" ]]; then
+	else
+		# Browse system units as an admin by default. User units explicitly
+		# remain unprivileged; prompt before launching FZF previews/actions.
+		force_sudo="1"
 		ctl="sudo systemctl"
 		jctl="sudo journalctl"
-		check_sudo_nopass || sudo -v
+		check_sudo_nopass || sudo -v || return 1
 	fi
 
 	local type_filter=""
@@ -213,7 +223,7 @@ EOF
 }
 
 function units() {
-	_units_core 0 "$@"
+	_units_core 1 "$@"
 }
 
 function sunits() {

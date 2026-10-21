@@ -35,7 +35,10 @@ check_sudo_nopass() {
   sudo -n true 2>/dev/null
 }
 if [[ -r "$HOME/.config/zsh/systemd-tools.zsh" ]]; then
-  source "$HOME/.config/zsh/systemd-tools.zsh"
+  source "$HOME/.config/zsh/systemd-tools.zsh" # units and sunits
+fi
+if [[ -r "$HOME/.config/zsh/container-tools.zsh" ]]; then
+  source "$HOME/.config/zsh/container-tools.zsh"
 fi
 
 if command -v starship >/dev/null 2>&1; then
