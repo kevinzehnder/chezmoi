@@ -3,9 +3,6 @@
 // Check the wiki for a full description of the configuration:
 // https://niri-wm.github.io/niri/Configuration:-Introduction
 
-// Permanent workspace for messengers.
-workspace "chat"
-
 // Input device configuration.
 // Find the full list of options on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Input
@@ -276,9 +273,6 @@ spawn-at-startup "noctalia"
 spawn-at-startup "/home/kevinzehnder/.cargo/bin/niriusd"
 
 
-// Bitwarden desktop (SSH agent depends on it).
-spawn-at-startup "/opt/Bitwarden/bitwarden-app"
-
 // Optional automounter for removable devices in WM sessions (install: pacman -S udiskie).
 spawn-sh-at-startup "if command -v udiskie >/dev/null && ! pgrep -x udiskie >/dev/null; then udiskie -t; fi"
 
@@ -365,12 +359,6 @@ window-rule {
 
     // Use this instead if you want them visible on third-party screenshot tools.
     // block-out-from "screencast"
-}
-
-// Always open the messengers on the permanent chat workspace.
-window-rule {
-    match app-id=r#"^signal$"#
-    open-on-workspace "chat"
 }
 
 // Rounded corners for all windows.
